@@ -2,10 +2,11 @@ import './admin/style.css';
 import './public-integration.css';
 import './customer.css';
 import {db,configured,result} from './supabase.js';
-import {esc,field,date,time,badge,table,errorText} from './admin/ui.js';
-import {mountBooking,renderBooking} from './public-booking.js';
-const app=document.querySelector('#app');let urls=[],generation=0;
-const clean=()=>{urls.forEach(URL.revokeObjectURL);urls=[];};
+import {esc,field,errorText} from './admin/ui.js';
+import {renderBooking} from './public-booking.js';
+import {mountCustomerProfile} from './customer-profile.js';
+const app=document.querySelector('#app');let generation=0,disposeProfile=()=>{};
+const clean=()=>{disposeProfile();disposeProfile=()=>{};};
 let recovery=/type=recovery/.test(location.hash);
 const bookingIntent=()=>location.pathname.includes('/agendar')||new URLSearchParams(location.search).has('agendar');
 const shell=body=>`<header class="customer-header"><a href="/" class="customer-brand"><span>Q</span><div>QUARTIER<small>ESTÉTICA E BEM-ESTAR</small></div></a><a class="back-to-site" href="/">← Voltar ao site</a></header><main class="customer-main">${body}</main>`;
@@ -40,7 +41,6 @@ async function render(){
  const version=++generation;clean();document.querySelectorAll('dialog').forEach(d=>d.remove());
  if(!configured){app.innerHTML=shell('<h1>Minha conta</h1><p>A conexão está sendo preparada. Entre em contato com a clínica.</p>');return;}
  try{
-  const catalog=await result(db.rpc('public_catalog'));
   const {data:{session}}=await db.auth.getSession();if(version!==generation)return;
   if(!session||recovery)return authForm();
   const profile=await result(db.rpc('customer_portal'));if(version!==generation)return;
@@ -48,17 +48,23 @@ async function render(){
    app.innerHTML=shell(`<section class="panel customer-auth"><div class="panel-body"><h1>Complete seu cadastro</h1><form>${field('name','Nome completo','text','',{required:true,maxLength:160})}${field('phone','WhatsApp com DDD','tel','',{required:true,maxLength:25})}<label class="q-consent"><input name="consent" type="checkbox" required>Autorizo o uso dos dados para atendimento e agendamento.</label><p class="form-error" role="alert"></p><button class="btn primary">Concluir cadastro</button></form><button class="btn ghost" id="logout">Sair</button></div></section>`);
    app.querySelector('form').onsubmit=async e=>{e.preventDefault();const b=e.target.querySelector('button');b.disabled=true;try{await result(db.rpc('register_customer',{full_name:e.target.name.value,phone:e.target.phone.value.replace(/\D/g,''),consent:e.target.consent.checked}));await render();}catch(err){e.target.querySelector('[role=alert]').textContent=errorText(err);}finally{b.disabled=false;}};
   }else{
-   const rows=data=>table(['Data','Serviço','Profissional','Status'],data.map(a=>[date(a.starts_at)+' · '+time(a.starts_at),esc(a.procedure_name),esc(a.professional_name),badge(a.status)]));
-   app.innerHTML=shell(`<div class="page-heading"><div><p class="eyebrow">MINHA CONTA</p><h1>Olá, ${esc(profile.client.name.split(' ')[0])}.</h1><p class="muted">Pedidos sujeitos à aprovação da clínica. Horários de Brasília.</p></div><div><button class="btn ghost" id="refresh">Atualizar</button><button class="btn ghost" id="logout">Sair</button></div></div><section class="panel customer-profile"><div class="panel-head"><h2>Meu perfil</h2></div><div class="panel-body"><p><strong>Nome:</strong> ${esc(profile.client.name)}</p><p><strong>E-mail:</strong> ${esc(session.user.email)}</p><p><strong>WhatsApp:</strong> ${esc(profile.client.whatsapp)}</p></div></section><div id="booking-place"></div><section class="panel"><div class="panel-head"><h2>Meus pedidos</h2></div>${rows(profile.requests)}</section><section class="panel"><div class="panel-head"><h2>Meus agendamentos</h2></div>${rows(profile.appointments)}</section><section class="panel"><div class="panel-head"><h2>Meu acompanhamento</h2></div><div class="photo-grid">${profile.photos.map(p=>`<article class="photo-card"><img data-private="${p.id}" alt="${esc(p.procedure_name)} — ${esc(p.category)}">${badge(p.category)}<h3>${esc(p.procedure_name)}</h3><p>${date(p.taken_on)}</p></article>`).join('')||'<p class="muted">As fotos liberadas pela clínica aparecerão aqui.</p>'}</div></section>`);
-   app.querySelector('#refresh').onclick=render;await mountBooking(catalog,app.querySelector('#booking-place'));
-   if(bookingIntent()){app.innerHTML=shell(`<div class="page-heading"><div><p class="eyebrow">SEU PRÓXIMO ENCONTRO</p><h1>Agendar uma avaliação.</h1><p class="muted">Reserve um momento para cuidar de você.</p></div><a class="btn secondary" href="/cliente">← Meu perfil</a></div><div id="booking-page"></div><button id="logout" class="btn ghost">Sair da conta</button>`);renderBooking(catalog,profile,app.querySelector('#booking-page'));return bindLogout();}
-   for(const p of profile.photos){const blob=await result(db.storage.from('evolution').download(p.object_path));if(version!==generation)return;const url=URL.createObjectURL(blob);urls.push(url);app.querySelector(`[data-private="${p.id}"]`).src=url;}
+   if(bookingIntent()){
+    const {data:catalog}=await db.rpc('public_catalog');if(version!==generation)return;
+    app.innerHTML=shell(`<div class="page-heading"><div><p class="eyebrow">SEU PRÓXIMO ENCONTRO</p><h1>Agendar uma avaliação.</h1><p class="muted">Reserve um momento para cuidar de você.</p></div><a class="btn secondary" href="/cliente">← Meu perfil</a></div><div id="booking-page"></div><button id="logout" class="btn ghost">Sair da conta</button>`);
+    renderBooking(catalog,profile,app.querySelector('#booking-page'));return bindLogout();
+   }
+   app.innerHTML=shell('<div id="customer-profile"></div>');
+   disposeProfile=mountCustomerProfile(app.querySelector('#customer-profile'),{profile,session,onRefresh:render,onLogout:logout});
+   return;
+
   }
   bindLogout();
  }catch(e){app.innerHTML=shell(`<h1>Não foi possível carregar sua conta.</h1><p>${esc(errorText(e))}</p><button class="btn" id="retry">Tentar novamente</button><button class="btn ghost" id="logout">Sair</button>`);app.querySelector('#retry').onclick=render;app.querySelector('#logout').onclick=async()=>{await db.auth.signOut();render();};}
 }
-function bindLogout(){app.querySelector('#logout').onclick=async()=>{clean();await db.auth.signOut();await render();};}
+async function logout(){clean();await db.auth.signOut();await render();}
+function bindLogout(){app.querySelector('#logout').onclick=logout;}
 window.addEventListener('pagehide',clean);
+window.addEventListener('pageshow',event=>{if(event.persisted)render();});
 setInterval(()=>{if(!document.hidden&&!document.querySelector('dialog[open]')&&app.querySelector('#refresh'))render();},60000);
 db?.auth.onAuthStateChange(event=>{if(event==='PASSWORD_RECOVERY'){recovery=true;setTimeout(render,0);}});
 render();

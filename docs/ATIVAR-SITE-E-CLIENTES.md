@@ -39,3 +39,9 @@ A disponibilidade cobre os próximos 30 dias em intervalos de 30 minutos, com du
 Personalizar site continua controlando textos, capa, cores, galeria, resultados autorizados, perguntas e depoimentos. Procedimentos e Equipe fornecem os dados comerciais públicos. Fichas e observações clínicas não são publicadas.
 
 Fotos do bucket evolution continuam privadas. Liberar para o cliente permite somente que a conta vinculada veja a foto; fotos de outros clientes são negadas. Fotos enviadas pelo editor público ficam no bucket separado site-media e exigem autorização de publicação quando forem resultados clínicos.
+
+## 7. Se a agenda não abrir
+
+Abra Pedidos pelo site ou Configurações no administrador. O quadro de disponibilidade verifica a ativação dos pedidos, os tratamentos publicados, os profissionais publicados, os vínculos e os horários. Clique em **Ativar agendamentos online** se os pedidos estiverem pausados. Os links **Configurar** levam à tela do item pendente. Essa ativação grava a configuração no Supabase usando a sessão do administrador; não depende de outro deploy.
+
+Um tratamento só é oferecido para agendamento quando está publicado, ativo e vinculado a pelo menos um profissional publicado e ativo. O perfil funciona mesmo se o catálogo público estiver temporariamente indisponível. As abas Visão geral, Agendamentos, Acompanhamento e Meus dados mantêm o histórico separado; fotos privadas só são baixadas ao abrir Acompanhamento e suas URLs temporárias são descartadas ao sair da aba.
