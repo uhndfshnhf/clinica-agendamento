@@ -1,0 +1,33 @@
+{
+  "name": "quartier-clinica",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "node --test tests/*.test.mjs",
+    "test:e2e": "playwright test",
+    "db:start": "supabase start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor",
+    "db:migrate": "supabase migration up --local",
+    "local:env": "node scripts/local-env.mjs",
+    "demo:seed": "node scripts/demo.mjs seed",
+    "demo:reset": "node scripts/demo.mjs reset",
+    "user:create": "node scripts/create-user.mjs",
+    "start": "node scripts/serve.mjs",
+    "functions:local": "node scripts/local-functions.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.99.3",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.58.2",
+    "vite": "7.3.1",
+    "supabase": "2.78.1"
+  }
+}
