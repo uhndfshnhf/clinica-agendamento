@@ -6,7 +6,7 @@ const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 const esc = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 const safeMedia = value => {
   const url = String(value || '');
-  return /^(assets\/|https:\/\/|\/[^/])/.test(url) && !/[<>"']/.test(url) ? url : '';
+  return (/^(assets\/|https:\/\/|\/[^/])/.test(url) || (['localhost','127.0.0.1'].includes(location.hostname) && /^http:\/\/(127\.0\.0\.1|localhost):54321\/storage\/v1\/object\/public\/site-media\/[a-f0-9-]+\.webp$/.test(url))) && !/[<>"']/.test(url) ? url : '';
 };
 const safeLink = value => { try { const u = new URL(value); return u.protocol === 'https:' ? u.href : ''; } catch { return ''; } };
 const PHOTO_DIMENSIONS = {
@@ -50,6 +50,7 @@ $('.dialog-eyebrow').textContent = C.name.toUpperCase();
 
 $('#about-content').innerHTML = `<div class="about-composition reveal">${photo(C.about.mainPhoto,'about-main')}${photo(C.about.detailPhoto,'about-detail')}<span class="about-caption">CUIDADO. EQUILÍBRIO. IDENTIDADE.</span></div><div class="editorial-copy reveal"><p class="eyebrow">SOBRE A ${esc(C.logoWord)}</p><h2 id="about-title">${esc(C.about.title)}</h2><p class="lead-copy">${esc(C.about.description)}</p><div class="authority">${C.about.facts.map((fact,i)=>`<div><span class="authority-number">${i===0?esc(fact.split(' ')[0]):pad(i)}</span><span>${esc(i===0?fact.split(' ').slice(1).join(' '):fact)}</span></div>`).join('')}</div>${C.demo?'<p class="demo-note">Número demonstrativo · substitua pelo dado real da clínica</p>':''}</div>`;
 
+if(C.procedures.length){
 let procedureIndex = 0;
 const procedureMessage = p => `Olá! Gostaria de saber mais sobre ${p.name}.`;
 $('#procedure-desktop').innerHTML = `<div class="procedure-list" role="tablist" aria-label="Procedimentos" aria-orientation="vertical">${C.procedures.map((p,i)=>`<button class="procedure-tab ${i===0?'active':''}" id="procedure-tab-${i}" role="tab" aria-selected="${i===0}" aria-controls="procedure-panel" tabindex="${i===0?'0':'-1'}" data-index="${i}"><span>${pad(i)}</span><strong>${esc(p.name)}</strong><span class="procedure-mark" aria-hidden="true">+</span></button>`).join('')}</div><div class="procedure-panel" id="procedure-panel" role="tabpanel" aria-labelledby="procedure-tab-0"><div class="procedure-image-stack">${C.procedures.map((p,i)=>photo(p.photo,`procedure-image ${i===0?'active':''}`)).join('')}</div><div class="procedure-panel-copy"><p class="eyebrow" id="procedure-number">PROCEDIMENTO 01</p><h3 id="procedure-name">${esc(C.procedures[0].name)}</h3><p id="procedure-description">${esc(C.procedures[0].description)}</p><button class="text-link" id="procedure-book">Quero saber mais </button></div></div>`;
@@ -74,13 +75,17 @@ setProcedure(0);
 $$('[data-procedure-book]').forEach(el=>el.addEventListener('click',()=>openWhatsApp(procedureMessage(C.procedures[Number(el.dataset.procedureBook)]))));
 $$('.procedure-accordion').forEach(el=>el.addEventListener('toggle',()=>{if(el.open)$$('.procedure-accordion').forEach(other=>{if(other!==el)other.open=false;});}));
 
+}else{$('#procedimentos').hidden=true;}
 $('#results-grid').innerHTML=C.results.map((item,index)=>`<article class="result-case reveal" aria-labelledby="case-title-${index}"><div class="compare"><img class="compare-before" src="${esc(safeMedia(item.before))}" alt="${esc(item.beforeAlt||`Antes — ${item.label}`)}" loading="lazy" width="1200" height="800"><img class="compare-after" src="${esc(safeMedia(item.after))}" alt="${esc(item.afterAlt||`Depois — ${item.label}`)}" loading="lazy" width="1200" height="800"><span class="compare-label before">ANTES</span><span class="compare-label after">DEPOIS</span><div class="compare-line" aria-hidden="true"><span>‹ ›</span></div><label class="sr-only" for="compare-range-${index}">Comparar antes e depois de ${esc(item.label)}: arraste ou use as setas</label><input type="range" id="compare-range-${index}" min="0" max="100" value="50" aria-valuetext="50% da imagem depois visível">${item.placeholder?'<span class="case-placeholder">Espaço reservado para um caso real</span>':''}</div><div class="result-case-caption"><p class="eyebrow">ANTES & DEPOIS</p><h3 id="case-title-${index}">${esc(item.label)}</h3><p class="small-copy">Arraste o controle para comparar.</p></div></article>`).join('');
 $$('.result-case input[type="range"]').forEach(input=>input.addEventListener('input',()=>{const value=Number(input.value);input.closest('.compare').style.setProperty('--split',value+'%');input.setAttribute('aria-valuetext',`${100-value}% da imagem depois visível`);}));
 
 $('#method-content').innerHTML=C.method.map((item,i)=>`<li class="method-step reveal"><span class="step-number">${pad(i)}</span><h3>${esc(item.title)}</h3><p>${esc(item.description)}</p></li>`).join('');
+if(C.team.length){
 const mainPerson=C.team[0];
 $('#team-content').innerHTML=`<div class="team-layout"><div class="team-main-photo reveal">${photo(mainPerson.photo)}</div><div class="team-main-copy reveal"><p class="eyebrow">PROFISSIONAL PRINCIPAL</p><h3>${esc(mainPerson.name)}</h3><p class="specialty">${esc(mainPerson.specialty)}</p><p class="team-bio">${esc(mainPerson.bio)}</p><div class="credentials"><span>${esc(mainPerson.education)}</span><span>${esc(mainPerson.registration)}</span></div><button class="text-link" id="team-more">Conheça nossa equipe </button>${C.demo?'<p class="demo-note">Profissionais fictícios · imagens ilustrativas geradas por IA</p>':''}</div><div class="team-secondary">${C.team.slice(1).map((p,i)=>`<button class="secondary-professional reveal" data-person="${i+1}">${photo(p.photo)}<span><strong>${esc(p.name)}</strong><small>${esc(p.specialty)}</small></span></button>`).join('')}</div></div>`;
 
+}else{$('#equipe').hidden=true;}
+if(C.testimonials.length){
 let reviewIndex=0, reviewTimer=null, reviewVisible=false, reviewHovered=false, reviewFocused=false;
 let reviewPaused=C.testimonialAutoplay?.enabled===false;
 const reviewInterval=Math.max(3500,Number(C.testimonialAutoplay?.interval)||5500);
@@ -114,6 +119,7 @@ if('IntersectionObserver'in window)new IntersectionObserver(entries=>{reviewVisi
 else {reviewVisible=true;syncReviews();}
 $('#testimonial-demo').hidden=!C.demo;if(safeLink(C.googleReviewsUrl)){$('#google-reviews').href=safeLink(C.googleReviewsUrl);$('#google-reviews').hidden=false;}
 
+}else{$('#depoimentos').hidden=true;}
 $('#clinic-gallery').innerHTML=C.gallery.map((item,i)=>`<figure class="gallery-item reveal" data-gallery-image="${esc(item.photo.src.split('/').pop().replace('.webp',''))}"><div class="gallery-image">${photo(item.photo)}${item.placeholder?'<span class="gallery-placeholder">INSERIR FOTO REAL</span>':''}</div><figcaption><span>${pad(i)}</span>${esc(item.title)}</figcaption></figure>`).join('');
 $('#gallery-demo').hidden=!C.demo;
 $('#faq-content').innerHTML=C.faq.map((item,i)=>`<details class="faq-item"><summary>${esc(item.question)}<span class="plus" aria-hidden="true">+</span></summary><div class="accordion-content"><p>${esc(item.answer)}</p></div></details>`).join('');
@@ -135,7 +141,9 @@ function openWhatsApp(message){const number=String(C.whatsapp||'').replace(/\D/g
 $$('[data-whatsapp]').forEach(el=>el.addEventListener('click',()=>openWhatsApp(el.dataset.whatsapp==='floating'?C.floatingMessage:el.dataset.whatsapp==='clinic'?'Olá! Gostaria de falar com a clínica.':C.whatsappMessage)));
 $$('[data-legal]').forEach(el=>el.addEventListener('click',()=>showInfo(el.dataset.legal==='privacy'?'Política de Privacidade':'Termos de Uso',`<p>${esc(C.legal[el.dataset.legal])}</p>`)));
 function personInfo(index){const p=C.team[index];showInfo(p.name,`${photo(p.photo,'dialog-person')}<p>${esc(p.specialty)}</p><p>${esc(p.bio)}</p><p class="small-copy">${esc(p.education)}<br>${esc(p.registration)}</p>${C.demo?'<p class="demo-note">Profissionais fictícios · imagens ilustrativas geradas por IA. Para uma clínica real, use os registros da própria clínica.</p>':''}`);}
+if(C.team.length){
 $$('[data-person]').forEach(el=>el.addEventListener('click',()=>personInfo(Number(el.dataset.person))));$('#team-more').addEventListener('click',()=>showInfo('Nossa equipe',C.team.map(p=>`<div class="team-dialog-entry"><h3>${esc(p.name)}</h3><p>${esc(p.specialty)}</p><p>${esc(p.bio)}</p><p class="small-copy">${esc(p.education)}<br>${esc(p.registration)}</p></div>`).join('')));
+}
 $('.close',dialog).addEventListener('click',()=>dialog.close());dialog.addEventListener('click',e=>{const rect=dialog.getBoundingClientRect();if(e.target===dialog&&(e.clientX<rect.left||e.clientX>rect.right||e.clientY<rect.top||e.clientY>rect.bottom))dialog.close();});
 
 const menu=$('.menu-toggle'),nav=$('#navigation');

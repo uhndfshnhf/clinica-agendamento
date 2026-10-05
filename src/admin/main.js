@@ -14,6 +14,8 @@ const routes = {
   evolucao: () => import("./pages/evolution.js"),
   lembretes: () => import("./pages/reminders.js"),
   equipe: () => import("./pages/team.js"),
+  site: () => import("./pages/site.js"),
+  solicitacoes: () => import("./pages/requests.js"),
   configuracoes: () => import("./pages/settings.js"),
 };
 const nav = [
@@ -24,6 +26,8 @@ const nav = [
   ["procedimentos", "procedures", "Procedimentos"],
   ["lembretes", "bell", "Lembretes"],
   ["equipe", "team", "Equipe"],
+  ["solicitacoes", "calendar", "Pedidos pelo site"],
+  ["site", "photos", "Personalizar site"],
   ["configuracoes", "settings", "Configurações"],
 ];
 let context = null,
@@ -118,9 +122,10 @@ async function render() {
   }
   try {
     const [user, settings] = await Promise.all([
-      result(db.from("users").select("*").eq("id", session.user.id).single()),
+      result(db.from("users").select("*").eq("id", session.user.id).maybeSingle()),
       result(db.from("settings").select("*").single()),
     ]);
+    if (!user)throw Error("Sua conta não está vinculada à equipe. Se você é cliente, acesse /cliente. A administração precisa vincular o acesso da equipe.");
     if (!user.active)
       throw Error("Acesso desativado. Procure o administrador.");
     if (version !== generation) return;
@@ -135,7 +140,7 @@ async function render() {
     app.innerHTML = `<div class="admin-shell"><div class="drawer-backdrop"></div><aside class="sidebar"><a class="wordmark" href="/admin" data-link>Q <span>QUARTIER<small>ESTÉTICA E BEM-ESTAR</small></span></a><p class="nav-caption">ESPAÇO DA CLÍNICA</p><nav aria-label="Menu administrativo">${nav
       .filter(
         ([s]) =>
-          user.role === "admin" || !["equipe", "configuracoes"].includes(s),
+          user.role === "admin" || !["equipe", "configuracoes", "site", "solicitacoes"].includes(s),
       )
       .map(
         ([s, i, label]) =>
@@ -204,7 +209,7 @@ async function render() {
     }
     if (
       user.role !== "admin" &&
-      ["equipe", "configuracoes"].includes(section)
+      ["equipe", "configuracoes", "site", "solicitacoes"].includes(section)
     ) {
       page.innerHTML = "<h1>Acesso restrito à administração.</h1>";
       return;

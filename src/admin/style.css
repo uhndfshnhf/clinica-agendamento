@@ -1439,3 +1439,5 @@ td .person-link {
 .panel-head > a {
   flex-shrink: 0;
 }
+
+.site-item{margin:24px 0;padding:16px;border:1px solid var(--border)}.site-item .panel-head{padding:0 0 16px;flex-wrap:wrap}.field input[type=file]{padding:12px}.field input[type=checkbox]{width:auto}

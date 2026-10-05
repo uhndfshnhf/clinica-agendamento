@@ -26,6 +26,9 @@ export const clientSchema = z.object({
   active: z.boolean(),
 });
 export const procedureSchema = z.object({
+  published:z.boolean().default(true),
+  photo_url:text(2000).default(""),
+  photo_alt:text(160).default(""),
   name: text(160).min(2, "Informe o nome."),
   description: text(5000),
   duration: z.coerce.number().int().min(5).max(480),

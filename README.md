@@ -1,11 +1,13 @@
 # Quartier · site público e gestão da clínica
 
-Evolução do site original fornecido em ZIP: HTML/CSS/JavaScript nativos, com Vite para módulos e build. O painel usa Supabase Auth, PostgreSQL com RLS e Storage privado. Não há cadastro público de usuários, banco simulado ou autenticação em memória.
+Evolução do site original fornecido em ZIP: HTML/CSS/JavaScript nativos, com Vite para módulos e build. O painel usa Supabase Auth, PostgreSQL com RLS e Storage privado. Clientes podem criar contas com confirmação de e-mail e CAPTCHA; o acesso da equipe é concedido separadamente. Não há banco simulado ou autenticação em memória.
 
 ## Estrutura
 
-- `index.html`, `public/`: site original. Os 27 arquivos de CSS, JavaScript, configuração e mídia foram preservados byte a byte. O HTML recebeu somente a entrada do módulo de integração.
-- `src/public.js`: contatos configuráveis e formulário secundário. Todos os CTAs de WhatsApp continuam funcionando. A hero e as seções existentes são preservadas.
+- `index.html`, `public/`: site original. As mídias e os estilos originais foram preservados. O renderizador agora recebe conteúdo público do painel. O módulo público busca o conteúdo aprovado antes de renderizar as seções.
+- `src/public.js`: conteúdo público do painel, contatos configuráveis e formulário de interesse. Todos os CTAs de WhatsApp continuam funcionando. A hero e as seções existentes são preservadas.
+- `cliente/index.html`, `src/customer.js`: área privada de clientes, pedidos de horário, confirmação e acompanhamento liberado.
+- `api/booking.js`: função de servidor Vercel com CAPTCHA, autenticação e limites persistentes.
 - `admin/index.html`, `src/admin/`: aplicação administrativa com rotas reais, módulos carregados sob demanda, componentes de formulário e tabelas reutilizados.
 - `supabase/migrations/`: banco, relacionamentos, índices, permissões e operações transacionais.
 - `supabase/functions/invite-team/`: convite de equipe, autorizado no servidor; service role nunca é enviado ao navegador.
@@ -45,7 +47,7 @@ O Mailpit local recebe e-mails de recuperação e convite; nenhum e-mail de test
 
 1. Configure `.env.local` a partir de `.env.example`, usando a URL e a chave **pública anon/publishable** do seu projeto nas variáveis `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`.
 2. Aplique as migrações, na ordem, no projeto correto. Com CLI autenticada: `npx supabase link --project-ref SEU_PROJECT_REF` e `npx supabase db push`. Isso altera o projeto de destino; confira-o antes de executar.
-3. Em Auth, habilite o provedor de e-mail e **desabilite novos cadastros públicos**. Configure Site URL e redirect allowlist para `https://SEU_DOMINIO/admin/login`. Ative política de senha de pelo menos 12 caracteres.
+3. Em Auth, habilite o provedor de e-mail e habilite cadastros de clientes com confirmação de e-mail e CAPTCHA Turnstile; contas da equipe continuam sendo criadas por convite ou pela administração. Configure Site URL e redirect allowlist para `https://SEU_DOMINIO/admin/login`. Ative política de senha de pelo menos 12 caracteres.
 4. Configure SMTP de produção para recuperação e convites. Publique a função com `npx supabase functions deploy invite-team`. A função usa as variáveis de servidor fornecidas pelo Supabase.
 5. Crie o primeiro administrador com `npm run user:create`, passando `ADMIN_EMAIL`, `ADMIN_NAME` e `ADMIN_PASSWORD` pelo ambiente seguro. Esse script requer `SUPABASE_SERVICE_ROLE_KEY` somente no processo servidor. Não use prefixo `VITE_` para segredos.
 6. Cadastre os profissionais e procedimentos. Associe profissionais aos procedimentos e clientes; contas de profissional só enxergam seus vínculos. Na tela Equipe, envie convites privados para novas contas.
@@ -86,3 +88,7 @@ node scripts/verify-original.mjs /caminho/do/ZIP-extraido/dist
 Os testes de banco e navegador precisam do Supabase local, `.env.local` e seed. Sem credenciais locais, os testes de segurança são explicitamente marcados como não executados; isso não valida permissões. O teste visual compara a hero e cada seção original em desktop/mobile quando o ZIP original está disponível. Os testes funcionais criam registros fictícios isolados; não execute contra produção.
 
 Consulte `VALIDATION.md` para os resultados executados nesta entrega e as limitações verificadas.
+
+## Site editável e área do cliente
+
+Consulte [o guia de ativação](docs/ATIVAR-SITE-E-CLIENTES.md) para aplicar as duas novas migrações, configurar CAPTCHA/segredos de servidor e ativar os pedidos sujeitos à aprovação. A área privada fica em `/cliente`, separada do acesso administrativo. Use `vercel dev` para testar localmente o endpoint `/api/booking`; o Vite e o servidor estático não executam funções Vercel.

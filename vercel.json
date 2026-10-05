@@ -4,7 +4,21 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "rewrites": [
-    { "source": "/admin", "destination": "/admin/index.html" },
-    { "source": "/admin/:path*", "destination": "/admin/index.html" }
+    {
+      "source": "/admin",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/cliente",
+      "destination": "/cliente/index.html"
+    },
+    {
+      "source": "/cliente/:path*",
+      "destination": "/cliente/index.html"
+    }
   ]
 }

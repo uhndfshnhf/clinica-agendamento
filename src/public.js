@@ -1,5 +1,7 @@
 import { db, configured } from "./supabase.js";
 import "./public-integration.css";
+import {preparePublicSite,loadPremium} from "./public-catalog.js";
+import {mountBooking} from "./public-booking.js";
 const escape = (v) =>
   String(v ?? "").replace(
     /[&<>"']/g,
@@ -15,69 +17,13 @@ async function start() {
     );
   const config = window.CLINIC_CONFIG;
   if (!config) return;
-  if (configured) {
-    try {
-      const { data: s, error } = await db.rpc("public_settings");
-      if (!error && s) {
-        if (s.whatsapp) config.whatsapp = s.whatsapp;
-        if (s.whatsapp_message) config.whatsappMessage = s.whatsapp_message;
-        if (s.phone) {
-          const link = document.querySelector(
-            '#contact-content a[href^="tel:"]',
-          );
-          if (link) {
-            link.href = "tel:+" + s.phone.replace(/\D/g, "");
-            link.textContent = s.phone;
-          }
-        }
-        if (s.address) {
-          document.querySelector(
-            "#contact-content>div:nth-child(4) p",
-          ).textContent = s.address;
-          document.querySelector("#footer-contact p").textContent = s.address;
-          const map = document.querySelector("#map-frame>p");
-          if (map) map.textContent = s.address;
-        }
-        if (s.hours)
-          document.querySelector(
-            "#contact-content>div:last-child p",
-          ).textContent = s.hours;
-        if (
-          s.instagram &&
-          /^https:\/\/([a-z0-9-]+\.)?instagram\.com\//i.test(s.instagram)
-        ) {
-          const contact = document.querySelector(
-            "#contact-content>div:nth-child(3)",
-          );
-          contact.innerHTML = `<span>Instagram</span><a href="${escape(s.instagram)}" target="_blank" rel="noopener noreferrer">Instagram</a>`;
-          const footer = document.querySelector("#footer-contact");
-          const old = footer.firstElementChild;
-          const a = document.createElement("a");
-          a.href = s.instagram;
-          a.target = "_blank";
-          a.rel = "noopener noreferrer";
-          a.textContent = "Instagram";
-          old.replaceWith(a);
-        }
-        if (s.email) {
-          const footer = document.querySelector("#footer-contact");
-          const a = document.createElement("a");
-          a.href = "mailto:" + s.email;
-          a.textContent = s.email;
-          footer.append(a);
-        }
-        if (s.name)
-          document.querySelector("#copyright").textContent =
-            `© ${new Date().getFullYear()} ${s.name}. Todos os direitos reservados.`;
-        if (s.logo && /^(\/[^/]|https:\/\/)/.test(s.logo)) {
-          const footerBrand = document.querySelector(".premium-footer .brand");
-          footerBrand.innerHTML = `<img class="client-logo" src="${escape(s.logo)}" alt="${escape(s.name)}">`;
-        }
-      }
-    } catch {
-      /* Public site remains available if backend is offline. */
-    }
-  }
+  const catalog=await preparePublicSite(config);
+  await loadPremium();
+  for(const [key,selector] of Object.entries({procedures:'#procedures-title',results:'#results-title',results_intro:'#resultados .section-heading>p:last-child',method:'#method-title',team:'#team-title',testimonials:'#testimonials-title',clinic:'#clinic-title',clinic_intro:'.gallery-heading>p',faq:'#faq-title',faq_intro:'.faq-intro',cta:'#cta-title',cta_intro:'.final-cta .section-inner>p:not(.eyebrow)',contact:'#contact-title'})){if(config.copy?.[key])document.querySelector(selector).textContent=config.copy[key];}
+  if(config.hero.title)document.querySelector('#hero-title').textContent=config.hero.title;
+  if(config.email){const a=document.createElement('a');a.href='mailto:'+config.email;a.textContent=config.email;document.querySelector('#footer-contact').append(a);}
+  const portal=document.createElement('a');portal.href='/cliente';portal.className='q-interest-link';portal.textContent='Minha conta · agendamentos e acompanhamento';document.querySelector('#contact-content').after(portal);
+  await mountBooking(catalog);
   // Keep every existing WhatsApp CTA intact. Add one secondary contact option.
   const contact = document.querySelector("#contact-content");
   const open = document.createElement("button");
@@ -125,6 +71,6 @@ async function start() {
     }
   };
   config.legal.privacy =
-    "Ao solicitar um contato, coletamos seu nome, WhatsApp e procedimento de interesse para responder ao seu pedido. O acesso é restrito à equipe autorizada da clínica. Não envie informações de saúde por este formulário. Para solicitar acesso, correção ou exclusão dos seus dados, entre em contato com a clínica pelos canais desta página. Links externos (WhatsApp, Instagram e Google Maps) seguem suas próprias políticas. Dados administrativos e fotos de pacientes ficam em área autenticada e não são publicados no site.";
+    "Ao solicitar um contato, coletamos seu nome, WhatsApp e procedimento de interesse para responder ao seu pedido. O acesso é restrito à equipe autorizada da clínica. Não envie informações de saúde por este formulário. Para solicitar acesso, correção ou exclusão dos seus dados, entre em contato com a clínica pelos canais desta página. Links externos (WhatsApp, Instagram e Google Maps) seguem suas próprias políticas. Agendamentos e fotos de acompanhamento ficam em área autenticada. Somente imagens com autorização de publicação são exibidas na galeria pública.";
 }
 start();

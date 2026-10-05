@@ -25,7 +25,7 @@ async function login(role) {
   return c;
 }
 test(
-  "Anonymous cannot read clinical tables or sign up",
+  "Anonymous cannot read clinical tables and customer signup cannot grant staff access",
   { skip: !configured },
   async () => {
     const anon = make();
@@ -43,11 +43,11 @@ test(
       const { data, error } = await anon.from(table).select("*");
       assert.ok(error || data.length === 0, table);
     }
-    const { error } = await anon.auth.signUp({
+    const { data: signup, error } = await anon.auth.signUp({
       email: "blocked@example.invalid",
       password: "blocked-password-123",
     });
-    assert.ok(error);
+    if(!error && signup.session) { const {data: staff, error: staffError}=await anon.rpc("is_staff");assert.ifError(staffError);assert.equal(staff,false); }
     const { data, error: settingsError } = await anon.rpc("public_settings");
     assert.ifError(settingsError);
     assert.ok(data.name);

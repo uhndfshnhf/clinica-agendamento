@@ -8,6 +8,8 @@ export default defineConfig({
         server.middlewares.use((req, res, next) => {
           if (/^\/admin(?:\/[^.?]*)?\/?(?:\?.*)?$/.test(req.url))
             req.url = "/admin/index.html";
+          if (/^\/cliente(?:\/[^.?]*)?\/?(?:\?.*)?$/.test(req.url))
+            req.url = "/cliente/index.html";
           next();
         });
       },
@@ -17,6 +19,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         public: resolve("index.html"),
+        customer: resolve("cliente/index.html"),
         admin: resolve("admin/index.html"),
       },
     },

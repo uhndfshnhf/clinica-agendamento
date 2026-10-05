@@ -1,3 +1,4 @@
+import {mediaField,bindMedia} from "./media.js";
 import { db, result, options, save } from "./data.js";
 import {
   field,
@@ -9,6 +10,7 @@ import {
   toISO,
   esc,
   labels,
+  safeImage,
 } from "./ui.js";
 import {
   clientSchema,
@@ -234,7 +236,7 @@ export async function procedureForm(ctx, item = {}) {
           .eq("procedure_id", item.id),
       )
     : [];
-  return modal(
+  const dialog=modal(
     item.id ? "Editar procedimento" : "Novo procedimento",
     field("name", "Nome", "text", item.name, { required: true, wide: true }) +
       field("description", "Descrição", "textarea", item.description, {
@@ -259,9 +261,12 @@ export async function procedureForm(ctx, item = {}) {
           [false, "Inativo"],
         ],
       }) +
+      field("published","Exibir no site","select",item.published??true,{choices:[[true,"Sim"],[false,"Não"]]}) +
+      mediaField("photo_url","Foto pública do serviço",item.photo_url) + field("photo_alt","Descrição acessível da foto","text",item.photo_alt) +
       `<div class="wide"><p class="muted">Profissionais responsáveis</p><div class="check-group">${staff.map((p) => `<label><input type="checkbox" name="responsible" value="${p.id}" ${selected.some((s) => s.professional_id === p.id) ? "checked" : ""}>${esc(p.name)}</label>`).join("")}</div></div>`,
     async (v, form) => {
-      const data = procedureSchema.parse({ ...v, active: v.active === "true" });
+      if(v.photo_url&&!safeImage(v.photo_url))throw Error("Foto inválida.");
+      const data = procedureSchema.parse({ ...v, active: v.active === "true",published:v.published==="true" });
       await result(
         db.rpc("save_procedure", {
           procedure: item.id || null,
@@ -273,4 +278,5 @@ export async function procedureForm(ctx, item = {}) {
       ctx.refresh();
     },
   );
+  bindMedia(dialog);return dialog;
 }

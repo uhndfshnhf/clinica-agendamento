@@ -25,6 +25,7 @@ const server = http.createServer(async (req, res) => {
     if (pathname === "/") pathname = "/index.html";
     if (/^\/admin(?:\/.*)?$/.test(pathname) && !extname(pathname))
       pathname = "/admin/index.html";
+    if (/^\/cliente(?:\/.*)?$/.test(pathname) && !extname(pathname))pathname="/cliente/index.html";
     const file = resolve(root, "." + pathname);
     if (!file.startsWith(root + sep)) {
       res.writeHead(403).end();

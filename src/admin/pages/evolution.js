@@ -134,7 +134,7 @@ export async function photoTimeline(root, ctx, clientId, filters = {}) {
   let disposed = false,
     nextCleanup = null;
   root.innerHTML = photos.length
-    ? `<section class="panel"><div class="panel-head"><h2>Linha do tempo</h2><span class="muted">Fotos privadas · acesso autenticado</span></div><div id="compare-container"></div><div class="photo-grid">${photos.map((p) => `<article class="photo-card"><img data-photo="${p.id}" alt="${esc(labels[p.category])} — ${esc(p.procedures?.name)}" loading="lazy">${badge(p.category)}<h3>${esc(p.clients?.name)}</h3><p>${esc(p.procedures?.name)} · ${date(p.taken_on)}</p><p>${esc(p.notes)}</p>${ctx.user.role === "admin" ? `<button class="btn ghost" data-delete="${p.id}">Excluir foto</button>` : ""}</article>`).join("")}</div>${pager(filters.page || 0, count, 18)}</section>`
+    ? `<section class="panel"><div class="panel-head"><h2>Linha do tempo</h2><span class="muted">Fotos privadas · acesso autenticado</span></div><div id="compare-container"></div><div class="photo-grid">${photos.map((p) => `<article class="photo-card"><img data-photo="${p.id}" alt="${esc(labels[p.category])} — ${esc(p.procedures?.name)}" loading="lazy">${badge(p.category)}<h3>${esc(p.clients?.name)}</h3><p>${esc(p.procedures?.name)} · ${date(p.taken_on)}</p><p>${esc(p.notes)}</p>${ctx.user.role === "admin" ? `<button class="btn ghost" data-delete="${p.id}">Excluir foto</button><button class="btn ghost" data-customer="${p.id}">${p.customer_visible?"Ocultar do cliente":"Liberar para o cliente"}</button>` : ""}</article>`).join("")}</div>${pager(filters.page || 0, count, 18)}</section>`
     : empty(
         "Nenhuma foto de evolução.",
         "Adicione fotos autorizadas para acompanhar o cuidado.",
@@ -179,6 +179,10 @@ export async function photoTimeline(root, ctx, clientId, filters = {}) {
     };
     show(pairs[0]);
   }
+  bind(root,"[data-customer]",el=>{
+    const p=photos.find(p=>p.id===el.dataset.customer);
+    return confirmAction(p.customer_visible?"Ocultar da área do cliente?":"Liberar para a área privada do cliente?","Esta ação não publica a foto no site. Somente o cliente vinculado à ficha poderá vê-la.",async()=>{await result(db.rpc("set_customer_photo_visibility",{photo:p.id,visible:!p.customer_visible}));toast("Acesso do cliente atualizado.");ctx.refresh();});
+  });
   bind(root, "[data-delete]", (el) => {
     const p = photos.find((p) => p.id === el.dataset.delete);
     return confirmAction(

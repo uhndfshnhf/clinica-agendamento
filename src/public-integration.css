@@ -106,3 +106,5 @@
     sans-serif;
   color: #88654e;
 }
+
+.q-booking-open{display:block;margin:24px 0;padding:16px 24px;background:#493b33;color:#fff;font:14px Arial,sans-serif;border:0;cursor:pointer}.q-captcha{margin:20px 0;min-height:65px}a.q-interest-link{display:block;margin:20px 0}.q-interest-dialog input[type=checkbox]{width:18px}

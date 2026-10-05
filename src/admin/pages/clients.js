@@ -125,7 +125,7 @@ async function detail(root, ctx) {
         .map((n) => n[0])
         .slice(0, 2)
         .join(""),
-    )}</span><div><p class="eyebrow">FICHA DO CLIENTE</p><h1>${esc(client.name)}</h1><p class="muted">Cliente desde ${date(client.created_at)} · ${client.active ? "Ativo" : "Inativo"}</p></div></div>${button("Editar ficha", "edit", "ghost")}</header><div class="inline-actions">${button("+ Agendar atendimento", "appointment")}${button("+ Adicionar evolução", "photo", "secondary")}</div><nav class="tabs" aria-label="Abas da ficha">${[
+    )}</span><div><p class="eyebrow">FICHA DO CLIENTE</p><h1>${esc(client.name)}</h1><p class="muted">Cliente desde ${date(client.created_at)} · ${client.active ? "Ativo" : "Inativo"}</p></div></div>${button("Editar ficha", "edit", "ghost")}${ctx.user.role==="admin"?button("Vincular conta do cliente","account","ghost"):""}</header><div class="inline-actions">${button("+ Agendar atendimento", "appointment")}${button("+ Adicionar evolução", "photo", "secondary")}</div><nav class="tabs" aria-label="Abas da ficha">${[
       ["overview", "Visão geral"],
       ["history", "Histórico"],
       ["evolution", "Evolução"],
@@ -182,6 +182,7 @@ async function detail(root, ctx) {
       tab = el.dataset.tab;
       return draw();
     });
+    bind(root,"[data-action=account]",()=>modal("Vincular acesso privado",field("email","E-mail confirmado do cliente","email",client.email||"",{required:true,wide:true})+'<p class="wide muted">Verifique a identidade do cliente antes de vincular. Esta conta terá acesso aos agendamentos e às fotos liberadas desta ficha. A conta precisa ter o e-mail confirmado.</p>',async v=>{await result(db.rpc("link_customer_account",{client:client.id,email_address:v.email}));toast("Conta vinculada à ficha do cliente.");}));
     bind(root, "[data-action=edit]", () => clientForm(local, client));
     bind(root, "[data-action=appointment]", () =>
       appointmentForm(local, {}, client.id),

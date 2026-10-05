@@ -1,3 +1,4 @@
+import {isPublicMediaUrl} from "../shared/media-validation.js";
 export const esc = (v) =>
   String(v ?? "").replace(
     /[&<>"']/g,
@@ -48,6 +49,8 @@ export const labels = {
   cancelled: "Cancelado",
   no_show: "Não compareceu",
   pending: "Pendente",
+  approved:"Aprovado",
+  rejected:"Recusado",
   new: "Novo",
   contacted: "Contatado",
   converted: "Convertido",
@@ -174,5 +177,5 @@ export const choice = (rows) => [
   ...rows.map((r) => [r.id, r.name]),
 ];
 export function safeImage(url) {
-  return /^\/(?!\/)|^https:\/\//.test(url || "") ? esc(url) : "";
+  return isPublicMediaUrl(url,{allowLocal:import.meta.env?.DEV===true}) ? esc(url) : "";
 }

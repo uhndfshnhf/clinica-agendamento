@@ -1,38 +1,24 @@
-# Validação da entrega
+# Validação da atualização — 05/10/2026
 
-## Resultado executado
+- `npm test`: 19 testes passaram, sem falhas nem testes ignorados.
+- `npm run test:e2e`: 14 testes Chromium passaram, sem falhas nem testes ignorados.
+- `npm run build`: build de produção passou.
+- `node scripts/verify-original.mjs`: 26 arquivos de configuração, estilo e mídia originais permanecem idênticos byte a byte. O renderizador público foi adaptado ao conteúdo do painel.
 
-- `bash scripts/cloud-install.sh`: executado com sucesso. Instalou o lockfile sem modificá-lo, verificou o CLI oficial, preservou `.env.local`, reaplicou somente migrações pendentes, reconheceu a demonstração existente sem duplicar registros, iniciou a função local e compilou o projeto.
-- `npm test`: **10 testes passaram; 0 falhas; 0 ignorados**. Validação de formulários e fuso, bloqueio de cadastros/leitura anônima, autorização por profissional, impedimento de escalada de função, criação de clientes por profissional, leads e conversão idempotente, limites de envio, autorização do convite e privacidade real do Storage.
-- `npm run test:e2e`: **11 testes passaram; 0 falhas; 0 ignorados**. Convite e recuperação de senha por e-mail local; login inválido; cliente e observações; agendamento e conflito de horário; conclusão de atendimento e retorno; upload antes/depois e comparação; todas as oito rotas em 1440, 768 e 390 px; agenda dia/semana/mês; lembretes; procedimentos; envio de contato público e conversão; restrição de acesso de profissional.
-- `npm run build`: passou. Entradas pública/administrativa separadas, módulos do painel carregados sob demanda. Os avisos sobre scripts/CSS originais indicam arquivos estáticos copiados para `dist`, não falhas de build.
-- Artefato de produção servido com `npm start`: redirecionamento privado, login, lista real do banco, recarga de rota profunda, página pública e formulário de interesse verificados no navegador, sem erros de página.
-- Bundle de produção inspecionado: sem service-role key ou senhas de demonstração.
+## Segurança e banco
 
-## Preservação do site
+Testes com Supabase local real validaram contas de clientes sem acesso de equipe, isolamento entre fichas, catálogo sem e-mails/telefones privados, restrição de cadastro a e-mail confirmado, pedidos exclusivamente por função de servidor, limite por conta e telefone, envio idempotente, limites por conexão sob concorrência, aprovação restrita ao administrador e impedimento de aprovar dois pedidos para o mesmo horário. A disponibilidade pública não contém dados de pacientes.
 
-`node scripts/verify-original.mjs` confirmou **27 arquivos originais idênticos byte a byte**: configuração, JavaScript público, CSS e mídias. O HTML original recebeu somente a entrada do módulo de integração.
+Downloads reais de Storage verificaram: foto privada não liberada é negada, foto liberada só é lida pelo cliente vinculado, outro cliente é bloqueado e a revogação retira o acesso futuro. Evolução clínica e mídia pública usam buckets separados. Observações clínicas não são retornadas pelo portal.
 
-Comparação de screenshots de cada seção, com movimento reduzido, passou em 1440 e 390 px: hero, sobre, procedimentos, resultados, método, equipe, depoimentos, galeria, FAQ e CTA final. Contato e rodapé são os pontos de integração intencionalmente alterados. Todos os botões originais de WhatsApp foram mantidos.
+O handler de servidor foi testado contra origem inválida, método incorreto, corpo excessivo, campos extras, falta de consentimento, honeypot, CAPTCHA inválido/hostname incorreto/ação incorreta, falta de configuração, sessão ausente, e-mail não confirmado, repetição e horário indisponível. Dados internos não são devolvidos nos erros. Endereços de conexão são transformados por HMAC para os limites persistidos.
 
-Os testes de rotas não detectaram erros de JavaScript ou overflow horizontal no desktop, tablet ou celular. Tabelas/calendário usam rolagem interna quando necessário.
+## Navegador
 
-## Dados e privacidade
+O fluxo novo usa uma conta confirmada criada pela fixture local, completa o cadastro, escolhe um horário, passa pelo handler real com o verificador externo de CAPTCHA substituído somente no teste, salva no banco, aprova no painel e exibe a confirmação ao cliente. Foram validadas a edição da capa, a projeção dos serviços, a retirada de serviços ocultos, upload público real com conversão WebP e exibição da foto no site, além de ausência de erros de JavaScript/overflow nos fluxos testados.
 
-Os registros da demonstração são fictícios. Os testes criam e removem seus próprios registros; dados de tentativas interrompidas também foram removidos. Fotos usadas no teste eram uma imagem ilustrativa do ZIP, não resultados clínicos reais. Nenhuma foto de paciente foi publicada.
+A aparência padrão da capa e da apresentação é comparada em desktop/mobile. A tipografia das demais seções é comparada ao original; comparações pixel a pixel abaixo do catálogo foram substituídas por verificações de estilo porque o conteúdo dinâmico desloca as seções por frações de pixel. Os fluxos administrativos antigos, convites, recuperação de senha, agenda, conflitos, histórico e evolução privada também passaram.
 
-Foram testados upload e download autenticados reais, leitura anônima negada, bucket não público, acesso negado a cliente não atribuído e impossibilidade de um profissional excluir uma foto clínica existente.
+## Limites da verificação
 
-## Ambiente e configuração
-
-Supabase Auth/PostgreSQL/Storage/Mailpit funcionaram localmente em Docker. O convite foi executado no Edge Runtime usando a mesma função de produção, com dependências empacotadas para evitar o bootstrap remoto bloqueado na nuvem. A validação de JWT e função administrativa permanece dentro da função.
-
-O driver Docker `vfs` exigiu consolidar as camadas da imagem PostgreSQL oficial por falta de espaço. O script preserva o conteúdo/configuração da imagem e verifica downloads/digests. Após reinstalar dependências com `npm ci`, reinicie o Vite para reconstruir o cache de módulos.
-
-Os campos `install_script` e `start_skill` foram salvos no rascunho do ambiente. Salvar o rascunho não publica o snapshot nem comprova restauração em uma nova tarefa. Revise e salve as alterações nas configurações do ambiente e publique quando desejar reutilizá-lo.
-
-## O que depende do projeto hospedado
-
-A URL do Supabase hospedado ainda não foi fornecida. Não foram aplicadas migrações, configurado SMTP, criado administrador, publicado site ou implantada função no projeto remoto. Esses passos estão no README. Chaves administrativas devem ser fornecidas somente por configuração segura de servidor, nunca pelo frontend ou pelo chat.
-
-E-mails foram recebidos no Mailpit local; entrega por um provedor SMTP externo não foi testada. Os testes usam Chromium e dados de demonstração; não representam validação de outros navegadores, carga de produção ou revisão jurídica da política de privacidade.
+Não houve conexão autenticada ao Supabase/Vercel hospedados. As duas migrações e os segredos de servidor ainda precisam ser aplicados pelo responsável, conforme docs/ATIVAR-SITE-E-CLIENTES.md. O formulário público vem desativado por padrão e pedidos falham de forma fechada sem configuração/verificação válida. A confirmação de cadastro por e-mail/SMTP e o Turnstile reais precisam ser testados no domínio publicado. Estes testes não garantem imunidade a abuso distribuído nem representam teste de carga.

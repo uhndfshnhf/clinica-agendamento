@@ -10,7 +10,7 @@ async function compare(path = "") {
   })) {
     const relative = join(path, e.name);
     if (e.isDirectory()) await compare(relative);
-    else if (relative !== "index.html") {
+    else if (!["index.html","premium.js"].includes(relative)) {
       if (
         digest(await readFile(join(original, relative))) !==
         digest(await readFile(join("public", relative)))
@@ -22,5 +22,5 @@ async function compare(path = "") {
 }
 await compare();
 console.log(
-  `${count} original visual/code/media files preserved byte for byte.`,
+  `${count} original style/config/media files preserved byte for byte.`,
 );

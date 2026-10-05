@@ -1,3 +1,4 @@
+import {mediaField,bindMedia} from "../media.js";
 import { db, result, list } from "../data.js";
 import {
   pageHead,
@@ -14,7 +15,7 @@ import {
   confirmAction,
 } from "../ui.js";
 async function professionalForm(ctx, item = {}) {
-  return modal(
+  const dialog=modal(
     item.id ? "Editar profissional" : "Novo profissional",
     field("name", "Nome completo", "text", item.name, {
       required: true,
@@ -32,13 +33,10 @@ async function professionalForm(ctx, item = {}) {
         "text",
         item.registration,
       ) +
-      field(
-        "photo_url",
-        "Foto (URL HTTPS ou /assets/...)",
-        "text",
-        item.photo_url,
-        { wide: true, hint: "Use apenas uma foto profissional autorizada." },
-      ) +
+      mediaField("photo_url","Foto pública do profissional",item.photo_url) +
+      field("published","Exibir no site e aceitar pedidos online","select",item.published??false,{choices:[[true,"Sim"],[false,"Não"]]}) +
+      field("bio","Apresentação pública","textarea",item.bio,{wide:true,maxLength:3000}) +
+      field("education","Formação","text",item.education,{maxLength:1000}) +
       field("role", "Função", "select", item.role || "professional", {
         choices: [
           ["professional", "Profissional"],
@@ -59,7 +57,7 @@ async function professionalForm(ctx, item = {}) {
       await result(
         db.rpc("save_professional", {
           professional: item.id || null,
-          details: { ...details, active: v.active === "true" },
+          details: { ...details, active: v.active === "true",published:v.published==="true" },
           access_role: role,
         }),
       );
@@ -67,6 +65,7 @@ async function professionalForm(ctx, item = {}) {
       ctx.refresh();
     },
   );
+  bindMedia(dialog);return dialog;
 }
 export async function render(root, ctx) {
   let page = 0,

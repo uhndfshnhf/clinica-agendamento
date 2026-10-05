@@ -75,7 +75,7 @@ export async function render(root, ctx) {
         "ORGANIZAÇÃO COM LEVEZA",
         "Agenda",
         "Tempo reservado para cuidar. Horários de Brasília.",
-        button("+ Novo agendamento", "new"),
+        button("+ Novo agendamento", "new") + (ctx.user.role==="admin"?'<a class="btn secondary" href="/admin/solicitacoes" data-link>Pedidos pelo site</a>':""),
       ) +
       `<section class="panel"><div class="toolbar"><button class="icon-btn" data-shift="-1" aria-label="Período anterior">${icon("chevron")}</button><label>Data <input aria-label="Data da agenda" type="date" value="${chosen}"></label><button class="icon-btn" data-shift="1" aria-label="Próximo período">${icon("arrow")}</button><button class="btn ghost" data-today>Hoje</button><span class="spacer"></span><div class="segmented">${[
         ["day", "Dia"],
