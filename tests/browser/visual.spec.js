@@ -60,14 +60,15 @@ for (const width of [1440, 390])
     await before.goto("http://127.0.0.1:5175");
     await after.goto("http://127.0.0.1:5173");
     await expect(after.locator("#about-content .media").first()).toBeVisible();
-    // Exact pixels remain comparable above the dynamic service catalog. Lower
+    // The header and WhatsApp control are intentionally redesigned and tested
+    // separately. Exact pixels remain comparable above the dynamic catalog. Lower
     // sections move by fractional pixels when service text changes; verify their
     // typography instead of tying the test to the original demo data.
     for(const selector of ['#resultados','.method-section','.testimonial-section','.clinic-section','.faq-section','.final-cta']){
       const styles=async page=>page.locator(selector+' h2').evaluate(el=>{const s=getComputedStyle(el);return {fontFamily:s.fontFamily,fontSize:s.fontSize,color:s.color,lineHeight:s.lineHeight};});
       expect(await styles(after),selector).toEqual(await styles(before));
     }
-    for(const page of [before,after])await page.addStyleTag({content:"#site-header{visibility:hidden}"});
+    for(const page of [before,after])await page.addStyleTag({content:"#site-header,.floating-wa{visibility:hidden!important}"});
     for (const selector of [
       ".hero",
       "#sobre",

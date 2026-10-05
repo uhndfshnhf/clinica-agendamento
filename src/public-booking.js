@@ -2,40 +2,15 @@ import {db} from './supabase.js';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export async function mountBooking(catalog,container=document.querySelector('#contact-content')){
  if(!catalog?.booking.enabled||!catalog.procedures.length)return;
- const open=document.createElement('button');open.className='q-submit q-booking-open';open.textContent='Solicitar horário pelo site';container.after(open);
- let dialog,key;
- open.onclick=async()=>{
-  const {data:{session}}=await db.auth.getSession();
-  if(!session){location.href='/cliente?agendar=1';return;}
-  const {data:profile,error}=await db.rpc('customer_portal');
-  if(error||!profile?.client){location.href='/cliente?agendar=1';return;}
-  if(dialog){dialog.showModal();return;}
-  dialog=document.createElement('dialog');dialog.className='q-interest-dialog';dialog.setAttribute('aria-labelledby','booking-title');
-  const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo'}).format(new Date());
-  const max=new Date();max.setDate(max.getDate()+30);
-  dialog.innerHTML=`<button class="q-close" aria-label="Fechar">×</button><h2 id="booking-title">Seu próximo cuidado.</h2><p>Olá, ${esc(profile.client.name)}. Escolha um horário. A equipe analisará seu pedido antes de confirmar. Horários de Brasília.</p><form><label>Serviço<select name="procedure" required><option value="">Selecione…</option>${catalog.procedures.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></label><label>Profissional<select name="professional" required><option value="">Selecione um serviço</option></select></label><label>Dia<input name="day" type="date" min="${today}" max="${max.toISOString().slice(0,10)}" required></label><label>Horário<select name="starts_at" required><option value="">Selecione profissional e dia</option></select></label><label class="q-consent"><input name="consent" type="checkbox" required>Autorizo o uso dos meus dados para analisar e responder a este pedido.</label><p class="q-form-status" role="status"></p><button class="q-submit" type="submit">Enviar pedido para aprovação</button><small>O horário só estará confirmado após a aprovação da clínica. Não envie informações de saúde por este formulário.</small></form>`;
-  document.body.append(dialog);const form=dialog.querySelector('form'),status=dialog.querySelector('[role=status]');
-  dialog.querySelector('.q-close').onclick=()=>dialog.close();dialog.showModal();
-  let slotGeneration=0;
-  async function slots(){
-   const generation=++slotGeneration;form.starts_at.innerHTML='<option value="">Selecione profissional e dia</option>';
-   if(!form.procedure.value||!form.professional.value||!form.day.value)return;
-   const {data,error}=await db.rpc('public_booking_slots',{procedure:form.procedure.value,professional:form.professional.value,chosen_day:form.day.value});
-   if(generation!==slotGeneration)return;
-   if(error){status.textContent='Não foi possível consultar os horários.';return;}
-   form.starts_at.innerHTML='<option value="">'+(data.length?'Selecione…':'Nenhum horário disponível')+'</option>'+data.map(s=>`<option value="${s.starts_at}">${new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'}).format(new Date(s.starts_at))}</option>`).join('');
-  }
-  form.procedure.onchange=()=>{const ids=catalog.assignments.filter(a=>a.procedure_id===form.procedure.value).map(a=>a.professional_id);form.professional.innerHTML='<option value="">Selecione…</option>'+catalog.professionals.filter(p=>ids.includes(p.id)).map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');slots();};
-  form.professional.onchange=slots;form.day.onchange=slots;
-  key=crypto.randomUUID();
-  form.onsubmit=async e=>{
-   e.preventDefault();const button=form.querySelector('[type=submit]');button.disabled=true;
-   try{
-    const {data:{session:fresh}}=await db.auth.getSession();if(!fresh)throw Error('Sua sessão expirou. Entre novamente.');
-    const {error}=await db.rpc('submit_customer_booking',{procedure:form.procedure.value,professional:form.professional.value,selected_time:form.starts_at.value,consent:form.consent.checked,request_key:key});
-    if(error)throw error;
-    form.reset();key=crypto.randomUUID();status.textContent='Pedido recebido! Acompanhe a aprovação na sua área do cliente.';
-   }catch(e){status.textContent=e.message||'Não foi possível enviar.';}finally{button.disabled=false;}
-  };
- };
+ const link=document.createElement('a');link.href='/cliente/agendar';link.className='q-submit q-booking-open';link.textContent='Agendar avaliação';container.after(link);
+}
+export function renderBooking(catalog,profile,container){
+ if(!catalog?.booking.enabled||!catalog.procedures.length){container.innerHTML='<section class="panel"><div class="panel-body"><h2>Agenda temporariamente indisponível</h2><p>Entre em contato com a clínica para combinar sua avaliação.</p><a href="/cliente" class="btn secondary">Voltar ao meu perfil</a></div></section>';return;}
+ const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Sao_Paulo'}).format(new Date());const max=new Date(Date.now()+30*86400000);
+ container.innerHTML=`<div class="booking-layout"><section class="panel booking-panel"><div class="panel-body"><p class="eyebrow">ESCOLHA SEU PRÓXIMO CUIDADO</p><h2>Um horário para você.</h2><p class="muted">Escolha o tratamento, o profissional e o melhor momento.</p><form class="booking-form"><div class="booking-step"><span class="step-number">01</span><div><h3>Seu tratamento</h3><label>Serviço<select name="procedure" required><option value="">Selecione um tratamento</option>${catalog.procedures.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></label><label>Profissional<select name="professional" required><option value="">Selecione um serviço primeiro</option></select></label></div></div><div class="booking-step"><span class="step-number">02</span><div><h3>Seu momento</h3><label>Dia<input name="day" type="date" min="${today}" max="${max.toISOString().slice(0,10)}" required></label><label>Horário<select name="starts_at" required><option value="">Selecione profissional e dia</option></select></label><p class="booking-zone">Horários de Brasília · próximos 30 dias</p></div></div><label class="q-consent"><input name="consent" type="checkbox" required>Autorizo o uso dos meus dados para analisar e responder a este pedido.</label><p class="q-form-status" role="status" aria-live="polite"></p><button class="btn primary" type="submit">Enviar pedido para aprovação <svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 19 19 5M5 5h14v14"/></svg></button></form></div></section><aside class="booking-aside"><p class="eyebrow">SEU ATENDIMENTO</p><h2>Cuidado em cada detalhe.</h2><div class="booking-person"><span class="profile-avatar">${esc(profile.client.name[0])}</span><div><strong>${esc(profile.client.name)}</strong><small>${esc(profile.client.whatsapp)}</small></div></div><div class="booking-note"><span>01 / SOLICITE</span><p>Escolha um horário disponível e envie seu pedido.</p><span>02 / AGUARDE A EQUIPE</span><p>A consulta estará confirmada depois da aprovação da clínica.</p><span>03 / ACOMPANHE</span><p>Consulte o status e suas fotos na sua área pessoal.</p></div><p class="weekly-note">Até <strong>2 consultas por semana</strong>, de segunda a domingo. Pedidos pendentes também contam.</p><a href="/cliente">Ver meus agendamentos →</a></aside></div>`;
+ const form=container.querySelector('form'),status=form.querySelector('[role=status]');let slotGeneration=0,key=crypto.randomUUID();
+ async function slots(){const version=++slotGeneration;status.textContent='';form.starts_at.innerHTML='<option value="">Selecione profissional e dia</option>';if(!form.procedure.value||!form.professional.value||!form.day.value)return;form.starts_at.innerHTML='<option value="">Buscando horários…</option>';const {data,error}=await db.rpc('public_booking_slots',{procedure:form.procedure.value,professional:form.professional.value,chosen_day:form.day.value});if(version!==slotGeneration)return;if(error){status.textContent='Não foi possível consultar os horários.';form.starts_at.innerHTML='<option value="">Tente novamente</option>';return;}form.starts_at.innerHTML='<option value="">'+(data.length?'Selecione um horário':'Nenhum horário disponível')+'</option>'+data.map(s=>`<option value="${s.starts_at}">${new Intl.DateTimeFormat('pt-BR',{hour:'2-digit',minute:'2-digit',timeZone:'America/Sao_Paulo'}).format(new Date(s.starts_at))}</option>`).join('');}
+ form.procedure.onchange=()=>{const ids=catalog.assignments.filter(a=>a.procedure_id===form.procedure.value).map(a=>a.professional_id);form.professional.innerHTML='<option value="">Selecione um profissional</option>'+catalog.professionals.filter(p=>ids.includes(p.id)).map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');slots();};form.professional.onchange=slots;form.day.onchange=slots;
+ const selected=new URLSearchParams(location.search).get('servico');if(catalog.procedures.some(p=>p.id===selected)){form.procedure.value=selected;form.procedure.onchange();}
+ form.onsubmit=async e=>{e.preventDefault();const button=form.querySelector('[type=submit]');button.disabled=true;try{const {data:{session}}=await db.auth.getSession();if(!session)throw Error('Sua sessão expirou. Entre novamente.');const {error}=await db.rpc('submit_customer_booking',{procedure:form.procedure.value,professional:form.professional.value,selected_time:form.starts_at.value,consent:form.consent.checked,request_key:key});if(error)throw error;container.innerHTML=`<section class="booking-success panel"><span class="success-mark" aria-hidden="true">✓</span><p class="eyebrow">UM PRIMEIRO PASSO PARA SE CUIDAR</p><h2>Pedido recebido!</h2><p>A equipe vai analisar seu horário. Acompanhe a aprovação na sua área do cliente.</p><a class="btn primary" href="/cliente">Ver meus agendamentos →</a><a class="btn secondary" href="/cliente/agendar">Solicitar outro horário</a></section>`;}catch(e){status.textContent=e.message||'Não foi possível enviar.';button.disabled=false;}};
 }

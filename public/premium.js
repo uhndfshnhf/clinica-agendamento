@@ -53,8 +53,8 @@ $('#about-content').innerHTML = `<div class="about-composition reveal">${photo(C
 if(C.procedures.length){
 let procedureIndex = 0;
 const procedureMessage = p => `Olá! Gostaria de saber mais sobre ${p.name}.`;
-$('#procedure-desktop').innerHTML = `<div class="procedure-list" role="tablist" aria-label="Procedimentos" aria-orientation="vertical">${C.procedures.map((p,i)=>`<button class="procedure-tab ${i===0?'active':''}" id="procedure-tab-${i}" role="tab" aria-selected="${i===0}" aria-controls="procedure-panel" tabindex="${i===0?'0':'-1'}" data-index="${i}"><span>${pad(i)}</span><strong>${esc(p.name)}</strong><span class="procedure-mark" aria-hidden="true">+</span></button>`).join('')}</div><div class="procedure-panel" id="procedure-panel" role="tabpanel" aria-labelledby="procedure-tab-0"><div class="procedure-image-stack">${C.procedures.map((p,i)=>photo(p.photo,`procedure-image ${i===0?'active':''}`)).join('')}</div><div class="procedure-panel-copy"><p class="eyebrow" id="procedure-number">PROCEDIMENTO 01</p><h3 id="procedure-name">${esc(C.procedures[0].name)}</h3><p id="procedure-description">${esc(C.procedures[0].description)}</p><button class="text-link" id="procedure-book">Quero saber mais </button></div></div>`;
-$('#procedure-mobile').innerHTML = C.procedures.map((p,i)=>`<details class="procedure-accordion" ${i===0?'open':''}><summary><span>${pad(i)}</span>${esc(p.name)}<span class="plus" aria-hidden="true">+</span></summary><div class="accordion-content">${photo(p.photo)}<p>${esc(p.description)}</p><button class="text-link" data-procedure-book="${i}">Quero saber mais </button></div></details>`).join('');
+$('#procedure-desktop').innerHTML = `<div class="procedure-list" role="tablist" aria-label="Procedimentos" aria-orientation="vertical">${C.procedures.map((p,i)=>`<button class="procedure-tab ${i===0?'active':''}" id="procedure-tab-${i}" role="tab" aria-selected="${i===0}" aria-controls="procedure-panel" tabindex="${i===0?'0':'-1'}" data-index="${i}"><span>${pad(i)}</span><strong>${esc(p.name)}</strong><span class="procedure-mark" aria-hidden="true">+</span></button>`).join('')}</div><div class="procedure-panel" id="procedure-panel" role="tabpanel" aria-labelledby="procedure-tab-0"><div class="procedure-image-stack">${C.procedures.map((p,i)=>photo(p.photo,`procedure-image ${i===0?'active':''}`)).join('')}</div><div class="procedure-panel-copy"><p class="eyebrow" id="procedure-number">PROCEDIMENTO 01</p><h3 id="procedure-name">${esc(C.procedures[0].name)}</h3><p id="procedure-description">${esc(C.procedures[0].description)}</p><button class="text-link" id="procedure-book">Agendar avaliação </button></div></div>`;
+$('#procedure-mobile').innerHTML = C.procedures.map((p,i)=>`<details class="procedure-accordion" ${i===0?'open':''}><summary><span>${pad(i)}</span>${esc(p.name)}<span class="plus" aria-hidden="true">+</span></summary><div class="accordion-content">${photo(p.photo)}<p>${esc(p.description)}</p><button class="text-link" data-procedure-book="${i}">Agendar avaliação </button></div></details>`).join('');
 function setProcedure(index, focus = false) {
   procedureIndex = (index+C.procedures.length)%C.procedures.length;
   const p = C.procedures[procedureIndex];
@@ -70,9 +70,9 @@ $$('.procedure-tab').forEach((el,i)=>{
   el.addEventListener('pointerenter',event=>{if(event.pointerType==='mouse')setProcedure(i);});
   el.addEventListener('keydown',event=>{if(['ArrowUp','ArrowDown','Home','End'].includes(event.key)){event.preventDefault();setProcedure(event.key==='Home'?0:event.key==='End'?C.procedures.length-1:procedureIndex+(event.key==='ArrowDown'?1:-1),true);}});
 });
-$('#procedure-book').addEventListener('click',()=>openWhatsApp(procedureMessage(C.procedures[procedureIndex])));
+$('#procedure-book').addEventListener('click',()=>{location.href='/cliente/agendar?servico='+encodeURIComponent(C.procedures[procedureIndex].id||'');});
 setProcedure(0);
-$$('[data-procedure-book]').forEach(el=>el.addEventListener('click',()=>openWhatsApp(procedureMessage(C.procedures[Number(el.dataset.procedureBook)]))));
+$$('[data-procedure-book]').forEach(el=>el.addEventListener('click',()=>{location.href='/cliente/agendar?servico='+encodeURIComponent(C.procedures[Number(el.dataset.procedureBook)].id||'');}));
 $$('.procedure-accordion').forEach(el=>el.addEventListener('toggle',()=>{if(el.open)$$('.procedure-accordion').forEach(other=>{if(other!==el)other.open=false;});}));
 
 }else{$('#procedimentos').hidden=true;}
@@ -127,12 +127,12 @@ $$('.faq-item').forEach(el=>el.addEventListener('toggle',()=>{if(el.open)$$('.fa
 
 const phone=String(C.phone||'').replace(/\D/g,'');
 const instagram=safeLink(C.instagramUrl);
-$('#contact-content').innerHTML=`<div><span>Telefone</span>${phone?`<a href="tel:+${phone}">${esc(C.phoneDisplay)}</a>`:`<p>${esc(C.phoneDisplay)}</p>`}</div><div><span>WhatsApp</span><button class="contact-link" data-whatsapp="evaluation">Agendar uma avaliação</button></div><div><span>Instagram</span>${instagram?`<a href="${esc(instagram)}" target="_blank" rel="noopener noreferrer">${esc(C.instagram)}</a>`:`<p>${esc(C.instagram)}</p>`}</div><div><span>Endereço</span><p>${esc(C.address)}</p></div><div><span>Horário</span><p>${C.hours.map(esc).join('<br>')}</p></div>`;
+$('#contact-content').innerHTML=`<div><span>Telefone</span>${phone?`<a href="tel:+${phone}">${esc(C.phoneDisplay)}</a>`:`<p>${esc(C.phoneDisplay)}</p>`}</div><div><span>Agendamento</span><a class="contact-link" href="/cliente/agendar">Agendar uma avaliação</a></div><div><span>Instagram</span>${instagram?`<a href="${esc(instagram)}" target="_blank" rel="noopener noreferrer">${esc(C.instagram)}</a>`:`<p>${esc(C.instagram)}</p>`}</div><div><span>Endereço</span><p>${esc(C.address)}</p></div><div><span>Horário</span><p>${C.hours.map(esc).join('<br>')}</p></div>`;
 $('#contact-demo').hidden=!C.demo;
 const map=safeLink(C.mapEmbedUrl);
 if(map && /^https:\/\/(www\.)?google\.com\/maps\/embed(?:[/?]|$)/.test(map))$('#map-frame').innerHTML=`<iframe src="${esc(map)}" title="Localização da ${esc(C.name)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`;
 else $('#map-frame > p').textContent=C.address;
-$('#footer-contact').innerHTML=`${instagram?`<a href="${esc(instagram)}" target="_blank" rel="noopener noreferrer">Instagram</a>`:'<span>Instagram</span>'}<button data-whatsapp="evaluation">WhatsApp</button><p>${esc(C.address)}</p>`;
+$('#footer-contact').innerHTML=`${instagram?`<a href="${esc(instagram)}" target="_blank" rel="noopener noreferrer">Instagram</a>`:'<span>Instagram</span>'}<a href="/cliente/agendar">Agendar avaliação</a><p>${esc(C.address)}</p>`;
 $('#copyright').textContent=`© ${new Date().getFullYear()} ${C.name}. Todos os direitos reservados.`;$('#footer-demo').hidden=!C.demo;
 
 const dialog=$('#info-dialog');

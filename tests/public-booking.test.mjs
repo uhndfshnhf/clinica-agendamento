@@ -34,6 +34,25 @@ test('Registered customers book privately; approval is atomic and rate limits re
   const appointments=await ok(svc.from('appointments').select('*').eq('professional_id',professional));assert.equal(appointments.length,1);assert.equal(appointments[0].status,'confirmed');
   slots=await ok(anon().rpc('public_booking_slots',{procedure,professional,chosen_day:day}));assert.ok(!slots.some(s=>s.starts_at===selected_time));
   const winner=results[0].error?1:0;assert.equal((await ok(customers[winner].rpc('customer_portal'))).appointments.length,1);
+  // A confirmed appointment and one pending request consume the weekly quota.
+  // Concurrent submissions cannot slip a third consultation through the limit.
+  slots=await ok(anon().rpc('public_booking_slots',{procedure,professional,chosen_day:day}));
+  const later=slots.filter(s=>s.starts_at>selected_time);
+  const concurrent=await Promise.all(later.slice(0,2).map(s=>customers[winner].rpc('submit_customer_booking',{procedure,professional,selected_time:s.starts_at,consent:true,request_key:randomUUID()})));
+  assert.equal(concurrent.filter(r=>!r.error).length,1);assert.match(concurrent.find(r=>r.error).error.message,/duas consultas por semana/);
+  const second=concurrent.find(r=>!r.error).data;
+  const manual={client_id:clients[winner],professional_id:professional,procedure_id:procedure,starts_at:later[3].starts_at,duration:60,ends_at:new Date(new Date(later[3].starts_at).getTime()+3600000).toISOString(),price:100,status:'confirmed'};
+  assert.match((await admin.from('appointments').insert(manual)).error.message,/duas consultas por semana/);
+  const secondAppointment=await ok(admin.rpc('review_booking_request',{request_id:second,decision:'approved'}));
+  assert.equal((await ok(customers[winner].rpc('customer_portal'))).appointments.length,2);
+  const third=await customers[winner].rpc('submit_customer_booking',{procedure,professional,selected_time:later[3].starts_at,consent:true,request_key:randomUUID()});assert.match(third.error.message,/duas consultas por semana/);
+  await ok(admin.from('appointments').update({status:'cancelled'}).eq('id',secondAppointment));
+  const replacement=await ok(customers[winner].rpc('submit_customer_booking',{procedure,professional,selected_time:later[3].starts_at,consent:true,request_key:randomUUID()}));
+  await ok(admin.rpc('review_booking_request',{request_id:replacement,decision:'rejected'}));
+  // Next São Paulo calendar week has an independent quota.
+  const nextDay=new Date(new Date(day+'T12:00:00Z').getTime()+7*86400000).toISOString().slice(0,10);
+  const nextSlots=await ok(anon().rpc('public_booking_slots',{procedure,professional,chosen_day:nextDay}));
+  await ok(customers[winner].rpc('submit_customer_booking',{procedure,professional,selected_time:nextSlots[0].starts_at,consent:true,request_key:randomUUID()}));
   // Real private photo download: customer sees only their own explicitly released photo.
   photoId=randomUUID();const path=clients[0]+'/'+photoId+'.webp';await ok(svc.storage.from('evolution').upload(path,new Uint8Array([82,73,70,70]),{contentType:'image/webp'}));
   await ok(svc.from('evolution_photos').insert({id:photoId,client_id:clients[0],procedure_id:procedure,category:'progress',object_path:path,customer_visible:false}));

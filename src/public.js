@@ -23,7 +23,7 @@ async function start() {
     const link=document.querySelector('#header-account');if(!link)return;
     if(!configured)return;
     const {data:{session}}=await db.auth.getSession();
-    if(!session){link.textContent='Entrar / cadastrar';return;}
+    if(!session){link.textContent='Entrar';return;}
     const {data:profile}=await db.rpc('customer_portal');
     link.textContent=profile?.client?'Meu perfil · '+profile.client.name.split(' ')[0]:'Minha conta';
   }
@@ -34,7 +34,7 @@ async function start() {
   if(config.email){const a=document.createElement('a');a.href='mailto:'+config.email;a.textContent=config.email;document.querySelector('#footer-contact').append(a);}
   const portal=document.createElement('a');portal.href='/cliente';portal.className='q-interest-link';portal.textContent='Minha conta · agendamentos e acompanhamento';document.querySelector('#contact-content').after(portal);
   await mountBooking(catalog);
-  // Keep every existing WhatsApp CTA intact. Add one secondary contact option.
+  // Secondary contact request, separate from appointment scheduling.
   const contact = document.querySelector("#contact-content");
   const open = document.createElement("button");
   open.className = "q-interest-link";

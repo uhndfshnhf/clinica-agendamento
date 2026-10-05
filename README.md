@@ -90,4 +90,4 @@ Consulte `VALIDATION.md` para os resultados executados nesta entrega e as limita
 
 ## Site editável e área do cliente
 
-Consulte [o guia de ativação](docs/ATIVAR-SITE-E-CLIENTES.md) para aplicar as duas novas migrações, configurar o cadastro de clientes e os pedidos sujeitos à aprovação. A área privada fica em `/cliente`, separada do acesso administrativo. Os pedidos usam RPC autenticada no Supabase e funcionam também pelo Vite ou servidor estático.
+Consulte [o guia de ativação](docs/ATIVAR-SITE-E-CLIENTES.md) para aplicar as migrações de site e clientes, configurar o cadastro de clientes e os pedidos sujeitos à aprovação. A área privada fica em `/cliente`, separada do acesso administrativo. Agendar avaliação abre o login ou a página /cliente/agendar para clientes já autenticados. Há limite de duas consultas por semana, somando pedidos pendentes e consultas ativas, validado pelo banco. Os pedidos usam RPC autenticada no Supabase e funcionam também pelo Vite ou servidor estático.
