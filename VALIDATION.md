@@ -1,24 +1,15 @@
-# Validação da atualização — 05/10/2026
+# Validação — acesso pelo cabeçalho e cadastro simplificado
 
-- `npm test`: 19 testes passaram, sem falhas nem testes ignorados.
-- `npm run test:e2e`: 14 testes Chromium passaram, sem falhas nem testes ignorados.
-- `npm run build`: build de produção passou.
-- `node scripts/verify-original.mjs`: 26 arquivos de configuração, estilo e mídia originais permanecem idênticos byte a byte. O renderizador público foi adaptado ao conteúdo do painel.
+- npm test: 12 testes locais passaram.
+- npm run test:e2e: 14 testes de navegador passaram.
+- npm run build: build de produção aprovado.
 
-## Segurança e banco
+O cadastro com metadados cria uma ficha visível ao administrador e uma conta privada vinculada. Mesmo fornecendo role=admin nos metadados, o cliente não recebe acesso de equipe. O cliente autenticado envia o pedido diretamente por RPC; a chamada anônima é negada. São mantidos os limites básicos por conta/telefone, o envio idempotente, a aprovação exclusiva da equipe e a proteção contra conflitos concorrentes de horários.
 
-Testes com Supabase local real validaram contas de clientes sem acesso de equipe, isolamento entre fichas, catálogo sem e-mails/telefones privados, restrição de cadastro a e-mail confirmado, pedidos exclusivamente por função de servidor, limite por conta e telefone, envio idempotente, limites por conexão sob concorrência, aprovação restrita ao administrador e impedimento de aprovar dois pedidos para o mesmo horário. A disponibilidade pública não contém dados de pacientes.
+No navegador, foram testados login, acesso ao perfil pelo cabeçalho, conclusão de cadastro de contas antigas, envio do pedido sem CAPTCHA/servidor intermediário, aprovação no painel e confirmação na área do cliente. Também passaram edição de conteúdo, ocultação de serviços, upload de fotos, estilos, navegação desktop/mobile e todos os fluxos administrativos anteriores.
 
-Downloads reais de Storage verificaram: foto privada não liberada é negada, foto liberada só é lida pelo cliente vinculado, outro cliente é bloqueado e a revogação retira o acesso futuro. Evolução clínica e mídia pública usam buckets separados. Observações clínicas não são retornadas pelo portal.
+As fotos clínicas continuam privadas, com acesso exclusivo à conta vinculada após liberação. As observações clínicas não aparecem na área do cliente. Uploads públicos ficam separados.
 
-O handler de servidor foi testado contra origem inválida, método incorreto, corpo excessivo, campos extras, falta de consentimento, honeypot, CAPTCHA inválido/hostname incorreto/ação incorreta, falta de configuração, sessão ausente, e-mail não confirmado, repetição e horário indisponível. Dados internos não são devolvidos nos erros. Endereços de conexão são transformados por HMAC para os limites persistidos.
+Cloudflare/Turnstile foram retirados do fluxo e não há mais endpoint Vercel nem segredos extras para pedir horários. O banco original deve estar instalado e a atualização docs/ATUALIZAR-BANCO.sql deve ser aplicada no Supabase hospedado. O pacote identifica etapas já instaladas antes de aplicar as ausentes. Ele foi executado localmente após as migrações para verificar que a repetição não gera erro.
 
-## Navegador
-
-O fluxo novo usa uma conta confirmada criada pela fixture local, completa o cadastro, escolhe um horário, passa pelo handler real com o verificador externo de CAPTCHA substituído somente no teste, salva no banco, aprova no painel e exibe a confirmação ao cliente. Foram validadas a edição da capa, a projeção dos serviços, a retirada de serviços ocultos, upload público real com conversão WebP e exibição da foto no site, além de ausência de erros de JavaScript/overflow nos fluxos testados.
-
-A aparência padrão da capa e da apresentação é comparada em desktop/mobile. A tipografia das demais seções é comparada ao original; comparações pixel a pixel abaixo do catálogo foram substituídas por verificações de estilo porque o conteúdo dinâmico desloca as seções por frações de pixel. Os fluxos administrativos antigos, convites, recuperação de senha, agenda, conflitos, histórico e evolução privada também passaram.
-
-## Limites da verificação
-
-Não houve conexão autenticada ao Supabase/Vercel hospedados. As duas migrações e os segredos de servidor ainda precisam ser aplicados pelo responsável, conforme docs/ATIVAR-SITE-E-CLIENTES.md. O formulário público vem desativado por padrão e pedidos falham de forma fechada sem configuração/verificação válida. A confirmação de cadastro por e-mail/SMTP e o Turnstile reais precisam ser testados no domínio publicado. Estes testes não garantem imunidade a abuso distribuído nem representam teste de carga.
+Não foi feita conexão autenticada ao Supabase/Vercel hospedados. Se CAPTCHA estiver ativado no painel Supabase, é necessário desativá-lo. A confirmação de e-mail segue a configuração do projeto. SMTP/entrega de confirmação de cadastro de produção ainda precisam ser verificados; os testes usam contas locais controladas.

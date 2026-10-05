@@ -1,60 +1,41 @@
-# Ativar o site editável, contas de clientes e pedidos de horário
+# Site, perfil do cliente e agendamentos — fluxo simplificado
 
-O código usa as variáveis públicas do Supabase já configuradas na Vercel. A agenda pública fica desativada por padrão e o servidor recusa pedidos se faltarem os segredos de proteção. Nenhum CAPTCHA garante ausência de abuso. Os limites reduzem spam e a revisão da equipe evita que pedidos ocupem a agenda automaticamente.
+## 1. Atualizar o banco
 
-## 1. Atualização do banco existente
+No SQL Editor do Supabase brvquonwboylfugueahp, execute docs/ATUALIZAR-BANCO.sql. Ele instala somente as etapas ainda ausentes e não apaga fichas, fotos ou agendamentos. Requer que o banco original da clínica já esteja instalado. Toda a atualização ocorre em uma transação. Se houver erro, envie a mensagem; não apague tabelas para tentar corrigir.
 
-No SQL Editor do projeto `brvquonwboylfugueahp`, execute **uma vez** `docs/ATUALIZAR-BANCO.sql`. Esse arquivo reúne somente as duas novas migrações em uma transação. Não execute novamente o SQL de instalação inicial. Nenhuma tabela clínica é apagada. Se ocorrer erro, a transação desfaz a atualização; envie a mensagem para diagnóstico. Quem já aplica migrações pela CLI deve aplicar os dois arquivos novos por esse mecanismo, em vez de executar o pacote manualmente. Não misture os mecanismos sem conciliar o histórico de migrações.
+Se você utiliza migrações pela CLI, aplique os arquivos novos por esse mecanismo e não use o pacote manual sem conciliar o histórico.
 
-## 2. Turnstile no Cloudflare
+## 2. Configurar contas no Supabase
 
-Entre no Cloudflare, abra Turnstile e crie um widget do tipo **Managed** para o hostname `clinica-estetica-demo-ruddy.vercel.app`. Copie a **Site Key** e a **Secret Key**.
+Em Authentication, habilite cadastros por e-mail e desative CAPTCHA/Bot and Abuse Protection, caso esteja habilitado. Cloudflare e Turnstile não são utilizados nesta versão.
 
-No administrador da clínica, em **Configurações**, coloque somente a **Site Key** no campo de chave pública antispam. A chave secreta fica exclusivamente nas configurações de servidor abaixo. Para domínio próprio, atualize também os hostnames do widget e a URL do servidor.
+A confirmação de e-mail segue a configuração do seu Supabase. Com confirmação habilitada, o cliente recebe o link e entra após confirmar. Com confirmação desabilitada, o cliente entra diretamente após cadastrar. Para confirmação e recuperação, configure SMTP.
 
-## 3. Segredos de servidor na Vercel
+Redirect URLs: https://clinica-estetica-demo-ruddy.vercel.app/cliente e https://clinica-estetica-demo-ruddy.vercel.app/admin/login. Site URL: https://clinica-estetica-demo-ruddy.vercel.app.
 
-Em Settings > Environment Variables, configure em Production:
+## 3. Vercel
 
-- `SUPABASE_SERVICE_ROLE_KEY`: chave administrativa do Supabase (service_role ou secret), somente no servidor.
-- `TURNSTILE_SECRET_KEY`: Secret Key do widget Cloudflare.
-- `PUBLIC_SITE_URL`: `https://clinica-estetica-demo-ruddy.vercel.app`
+Mantenha apenas as duas variáveis públicas já configuradas: VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY. O envio de pedidos não exige funções Vercel, TURNSTILE_SECRET_KEY, PUBLIC_SITE_URL nem SUPABASE_SERVICE_ROLE_KEY no servidor. A chave administrativa continua sendo necessária somente para scripts administrativos externos que você escolha executar, nunca no navegador.
 
-Mantenha `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` como já estavam. Nunca prefixe segredos com `VITE_`. Não envie essas chaves pelo chat e não salve no Git. Faça Redeploy na Vercel depois de alterar variáveis. O endpoint `/api/booking` precisa do deploy Vercel com funções; um upload de HTML estático isolado não fornece esse endpoint. Pedidos são aceitos somente a partir do domínio exato de `PUBLIC_SITE_URL`.
+O push na main inicia o deploy do repositório conectado. Aguarde Ready.
 
-## 4. Cadastro e confirmação de e-mail no Supabase
+## 4. Fluxo do cliente
 
-Em Authentication, habilite novos cadastros por e-mail e **exija confirmação de e-mail**. Novas contas não ganham permissão de equipe: ficam separadas em `customer_accounts`. Não habilite contas anônimas.
+O cabeçalho tem Entrar / cadastrar. O cadastro pede nome, WhatsApp, e-mail, senha e consentimento. O banco cria imediatamente a ficha em Clientes no painel e uma conta privada vinculada, sem dar permissões de equipe. Depois do login, o cabeçalho muda para Meu perfil e a página mostra os dados do cliente, pedidos, agendamentos e fotos liberadas.
 
-Em Authentication > Bot and Abuse Protection, ative CAPTCHA com provedor **Turnstile**, usando a Secret Key desse widget. Ajuste também os limites de autenticação. Configure SMTP real para confirmação e recuperação de senha; o SMTP de demonstração do Supabase possui restrições de destinatários e envio.
+Contas antigas que ainda não tenham ficha precisam concluir o cadastro na primeira entrada. Clientes já cadastrados pela clínica podem ser vinculados a uma conta confirmada pelo administrador usando Clientes > Vincular conta do cliente, após verificar a identidade.
 
-Em URL Configuration:
+Clientes cadastrados podem solicitar horários. A equipe continua aprovando ou recusando em Pedidos pelo site. Pedidos não ocupam a agenda antes da aprovação. O banco verifica conflitos novamente e só confirma um atendimento por profissional/horário. O estado aparece na área do cliente.
 
-- Site URL: `https://clinica-estetica-demo-ruddy.vercel.app`
-- Redirect URLs: `https://clinica-estetica-demo-ruddy.vercel.app/cliente` e `https://clinica-estetica-demo-ruddy.vercel.app/admin/login`.
+## 5. Preparar serviços e equipe
 
-## 5. Conteúdo e horários
+Em Procedimentos, marque Exibir no site, mantenha o serviço ativo e associe os profissionais responsáveis. Em Equipe, marque Exibir no site e aceitar pedidos online nos profissionais adequados. Em Configurações, defina dias e horários; a atualização habilita os pedidos online e a equipe pode desativá-los quando necessário.
 
-- **Personalizar site**: capa, apresentação, títulos das seções, cores, galeria, resultados, etapas do atendimento, perguntas frequentes, depoimentos e textos legais. Salvar publica a seção; visitantes recebem a versão nova ao atualizar a página.
-- **Procedimentos**: o nome e descrição são usados no site. Escolha Exibir no site e envie a foto pública. Serviços inativos ou ocultos não aparecem nem podem receber novos pedidos. Os preços permanecem no painel.
-- **Equipe**: escolha Exibir no site e aceitar pedidos online para os profissionais que atenderão pedidos. Fotos, apresentação, formação e registro são públicos; telefones, e-mails e contas da equipe não fazem parte da projeção pública.
-- Associe os profissionais aos procedimentos, como na agenda existente.
-- **Configurações**: defina dias e horários online, coloque a Site Key e ative Receber pedidos. Disponibilidade: próximos 30 dias, intervalos de 30 minutos, antecedência mínima de duas horas, respeitando duração e conflitos de agenda. Para outra política de agenda, ajuste antes de ativar.
+A disponibilidade cobre os próximos 30 dias em intervalos de 30 minutos, com duas horas de antecedência mínima. Permanecem validação no banco, autenticação, um pedido pendente recente por conta/telefone, três pedidos em 24 horas e proteção contra envio duplicado. Não há desafio CAPTCHA nem envio automático de WhatsApp/SMS.
 
-## 6. Fluxo do cliente e da equipe
+## 6. Site editável e fotos
 
-O cliente acessa `/cliente`, cria a conta, confirma o e-mail, entra e completa nome/WhatsApp. Depois escolhe serviço, profissional, dia e horário e conclui o CAPTCHA. Não são aceitos pedidos anônimos. O horário fica pendente até a equipe aprovar em **Pedidos pelo site**. Na aprovação, o banco verifica disponibilidade novamente e confirma o agendamento em uma transação. Pedidos pendentes não bloqueiam horários; se outro atendimento ocupar o horário, a equipe deve combinar um novo horário. A aprovação ou recusa aparece na conta do cliente. Não há envio automático de WhatsApp nem SMS nesta versão.
+Personalizar site continua controlando textos, capa, cores, galeria, resultados autorizados, perguntas e depoimentos. Procedimentos e Equipe fornecem os dados comerciais públicos. Fichas e observações clínicas não são publicadas.
 
-Limites: oito tentativas por conexão/hora, no máximo três pedidos por conta/telefone em 24 horas e um pedido pendente recente por conta/telefone. A chave de idempotência evita duplicação por repetição do envio. Falhas de configuração ou de verificação antispam bloqueiam o pedido. Os limites por conexão usam HMAC, sem persistir o IP bruto no banco. O CAPTCHA impede reutilização de tokens, e o servidor verifica resultado, hostname e ação.
-
-## 7. Fichas existentes e fotos
-
-Um telefone informado no cadastro nunca dá acesso a uma ficha antiga. Para um cliente já cadastrado pela clínica, abra sua ficha em **Clientes > Vincular conta do cliente**, verifique a identidade da pessoa e use o e-mail confirmado da conta. O banco impede vincular contas da equipe ou trocar uma conta que já tenha pedidos/histórico em outra ficha sem revisão.
-
-Fotos de evolução continuam no bucket privado. Em **Evolução**, use **Liberar para o cliente** para tornar uma foto acessível exclusivamente à conta vinculada à ficha. Observações clínicas e documentos internos não são expostos no portal. O cliente não acessa fotos não liberadas nem fotos de outras pessoas.
-
-Fotos do site ficam em outro bucket, `site-media`, público. Imagens são convertidas para WebP e seus metadados removidos. Resultados e depoimentos exigem confirmação da autorização para publicação no editor. Não copie fotos clínicas para a galeria sem a autorização adequada. Retirar uma foto da seção remove sua exibição; arquivos públicos já compartilhados podem continuar em cache ou ter sido copiados por terceiros.
-
-## Verificação de produção
-
-Antes de ativar, teste uma conta real: confirmar e-mail, completar cadastro, enviar pedido, aprovar no painel, verificar o horário na agenda e na conta do cliente. Teste também uma foto liberada e uma não liberada. O Cloudflare real, SMTP e a rede de produção exigem essa verificação; os testes locais usam um substituto controlado somente para o serviço externo de CAPTCHA.
+Fotos do bucket evolution continuam privadas. Liberar para o cliente permite somente que a conta vinculada veja a foto; fotos de outros clientes são negadas. Fotos enviadas pelo editor público ficam no bucket separado site-media e exigem autorização de publicação quando forem resultados clínicos.

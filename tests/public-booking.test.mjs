@@ -18,7 +18,8 @@ test('Registered customers book privately; approval is atomic and rate limits re
   }
   const cat=await ok(anon().rpc('public_catalog'));assert.ok(cat.procedures.some(p=>p.id===procedure));assert.ok(!('email' in cat.professionals.find(p=>p.id===professional)));
   const day=new Date(Date.now()+86400000*3).toISOString().slice(0,10);let slots=await ok(anon().rpc('public_booking_slots',{procedure,professional,chosen_day:day}));assert.ok(slots.length>0);const selected_time=slots[0].starts_at;
-  const key=randomUUID();const request=await ok(svc.rpc('submit_booking_request',{customer:ids[0],procedure,professional,selected_time,consent:true,request_key:key}));
+  assert.ok((await anon().rpc('submit_customer_booking',{procedure,professional,selected_time,consent:true,request_key:randomUUID()})).error);
+  const key=randomUUID();const request=await ok(customers[0].rpc('submit_customer_booking',{procedure,professional,selected_time,consent:true,request_key:key}));
   assert.equal(await ok(svc.rpc('submit_booking_request',{customer:ids[0],procedure,professional,selected_time,consent:true,request_key:key})),request);
   assert.ok((await svc.rpc('submit_booking_request',{customer:ids[0],procedure,professional,selected_time,consent:true,request_key:randomUUID()})).error);
   assert.ok((await customers[0].rpc('submit_booking_request',{customer:ids[0],procedure,professional,selected_time,consent:true,request_key:randomUUID()})).error);
@@ -33,7 +34,6 @@ test('Registered customers book privately; approval is atomic and rate limits re
   const appointments=await ok(svc.from('appointments').select('*').eq('professional_id',professional));assert.equal(appointments.length,1);assert.equal(appointments[0].status,'confirmed');
   slots=await ok(anon().rpc('public_booking_slots',{procedure,professional,chosen_day:day}));assert.ok(!slots.some(s=>s.starts_at===selected_time));
   const winner=results[0].error?1:0;assert.equal((await ok(customers[winner].rpc('customer_portal'))).appointments.length,1);
-  const hash=randomBytes(32).toString('hex');const budgets=await Promise.all(Array.from({length:12},()=>svc.rpc('consume_booking_budget',{key_hash:hash})));assert.equal(budgets.filter(r=>r.data===true).length,8);assert.ok((await anon().rpc('consume_booking_budget',{key_hash:hash})).error);
   // Real private photo download: customer sees only their own explicitly released photo.
   photoId=randomUUID();const path=clients[0]+'/'+photoId+'.webp';await ok(svc.storage.from('evolution').upload(path,new Uint8Array([82,73,70,70]),{contentType:'image/webp'}));
   await ok(svc.from('evolution_photos').insert({id:photoId,client_id:clients[0],procedure_id:procedure,category:'progress',object_path:path,customer_visible:false}));
@@ -53,4 +53,14 @@ test('Registered customers book privately; approval is atomic and rate limits re
   if(procedure)await svc.from('procedures').delete().eq('id',procedure);if(professional)await svc.from('professionals').delete().eq('id',professional);
   if(settings)await svc.from('settings').update({booking_enabled:settings.booking_enabled,booking_days:settings.booking_days,booking_open:settings.booking_open,booking_close:settings.booking_close}).eq('id',true);
  }
+});
+
+test('Signup metadata creates a customer in the admin list without staff privileges',async()=>{
+ const {user}=await ok(svc.auth.admin.createUser({email:`new-customer-${Date.now()}@example.invalid`,password:randomBytes(20).toString('hex'),email_confirm:false,user_metadata:{full_name:'Novo cliente do site',phone:'11955556666',customer_consent:true,role:'admin'}}));
+ let cid;try{
+  const account=await ok(svc.from('customer_accounts').select('*').eq('user_id',user.id).single());cid=account.client_id;
+  const admin=anon();await ok(admin.auth.signInWithPassword({email:process.env.DEMO_ADMIN_EMAIL,password:process.env.DEMO_ADMIN_PASSWORD}));
+  const client=await ok(admin.from('clients').select('name,whatsapp').eq('id',cid).single());assert.equal(client.name,'Novo cliente do site');
+  assert.equal((await ok(svc.from('users').select('*').eq('id',user.id))).length,0);
+ }finally{await svc.from('customer_accounts').delete().eq('user_id',user.id);if(cid)await svc.from('clients').delete().eq('id',cid);await svc.auth.admin.deleteUser(user.id);}
 });

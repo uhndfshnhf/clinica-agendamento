@@ -67,6 +67,7 @@ for (const width of [1440, 390])
       const styles=async page=>page.locator(selector+' h2').evaluate(el=>{const s=getComputedStyle(el);return {fontFamily:s.fontFamily,fontSize:s.fontSize,color:s.color,lineHeight:s.lineHeight};});
       expect(await styles(after),selector).toEqual(await styles(before));
     }
+    for(const page of [before,after])await page.addStyleTag({content:"#site-header{visibility:hidden}"});
     for (const selector of [
       ".hero",
       "#sobre",

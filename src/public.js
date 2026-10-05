@@ -19,6 +19,16 @@ async function start() {
   if (!config) return;
   const catalog=await preparePublicSite(config);
   await loadPremium();
+  async function accountHeader(){
+    const link=document.querySelector('#header-account');if(!link)return;
+    if(!configured)return;
+    const {data:{session}}=await db.auth.getSession();
+    if(!session){link.textContent='Entrar / cadastrar';return;}
+    const {data:profile}=await db.rpc('customer_portal');
+    link.textContent=profile?.client?'Meu perfil · '+profile.client.name.split(' ')[0]:'Minha conta';
+  }
+  await accountHeader();
+  db?.auth.onAuthStateChange(()=>setTimeout(accountHeader,0));
   for(const [key,selector] of Object.entries({procedures:'#procedures-title',results:'#results-title',results_intro:'#resultados .section-heading>p:last-child',method:'#method-title',team:'#team-title',testimonials:'#testimonials-title',clinic:'#clinic-title',clinic_intro:'.gallery-heading>p',faq:'#faq-title',faq_intro:'.faq-intro',cta:'#cta-title',cta_intro:'.final-cta .section-inner>p:not(.eyebrow)',contact:'#contact-title'})){if(config.copy?.[key])document.querySelector(selector).textContent=config.copy[key];}
   if(config.hero.title)document.querySelector('#hero-title').textContent=config.hero.title;
   if(config.email){const a=document.createElement('a');a.href='mailto:'+config.email;a.textContent=config.email;document.querySelector('#footer-contact').append(a);}
