@@ -1,4 +1,5 @@
-import { db, result, list, appointmentSelect, save } from "../data.js";
+import { dataFor } from '../data.js';
+import { result, appointmentSelect } from "../data.js";
 import {
   pageHead,
   button,
@@ -17,6 +18,7 @@ import {
 import { clientForm, appointmentForm } from "../forms.js";
 import { appointmentTable, bindAppointments } from "./agenda.js";
 export async function render(root, ctx) {
+ const {db,list,save,appointments}=dataFor(ctx.db);
   if (ctx.id) return detail(root, ctx);
   let page = 0,
     search = "",
@@ -82,6 +84,7 @@ export async function render(root, ctx) {
   await draw();
 }
 async function detail(root, ctx) {
+ const {db,list,save,appointments}=dataFor(ctx.db);
   let tab = "overview",
     release = null;
   async function draw() {

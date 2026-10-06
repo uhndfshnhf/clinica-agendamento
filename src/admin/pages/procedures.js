@@ -1,4 +1,5 @@
-import { list, save } from "../data.js";
+import { dataFor } from '../data.js';
+
 import {
   pageHead,
   button,
@@ -13,6 +14,7 @@ import {
 } from "../ui.js";
 import { procedureForm } from "../forms.js";
 export async function render(root, ctx) {
+ const {list,save}=dataFor(ctx.db);
   let page = 0,
     search = "",
     active = "";

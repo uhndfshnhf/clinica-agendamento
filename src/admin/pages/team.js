@@ -1,5 +1,6 @@
+import { dataFor } from '../data.js';
 import {mediaField,bindMedia} from "../media.js";
-import { db, result, list } from "../data.js";
+import { result } from "../data.js";
 import {
   pageHead,
   button,
@@ -15,6 +16,7 @@ import {
   confirmAction,
 } from "../ui.js";
 async function professionalForm(ctx, item = {}) {
+ const {db,list}=dataFor(ctx.db);
   const dialog=modal(
     item.id ? "Editar profissional" : "Novo profissional",
     field("name", "Nome completo", "text", item.name, {
@@ -65,9 +67,10 @@ async function professionalForm(ctx, item = {}) {
       ctx.refresh();
     },
   );
-  bindMedia(dialog);return dialog;
+  bindMedia(dialog,ctx.db);return dialog;
 }
 export async function render(root, ctx) {
+ const {db,list}=dataFor(ctx.db);
   let page = 0,
     search = "";
   async function draw() {
@@ -132,7 +135,7 @@ export async function render(root, ctx) {
               body: {
                 professional_id: p.id,
                 role: v.role,
-                redirect_to: location.origin + "/admin/login",
+                redirect_to: (ctx.store?.site_url || location.origin) + "/admin/login",
               },
             },
           );

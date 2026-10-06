@@ -19,7 +19,8 @@
     "demo:reset": "node scripts/demo.mjs reset",
     "user:create": "node scripts/create-user.mjs",
     "start": "node scripts/serve.mjs",
-    "functions:local": "node scripts/local-functions.mjs"
+    "functions:local": "node scripts/local-functions.mjs",
+    "build:panel": "VITE_APP_MODE=panel vite build --outDir dist-panel"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.99.3",

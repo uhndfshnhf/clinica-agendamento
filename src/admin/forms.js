@@ -1,5 +1,6 @@
+import { dataFor } from './data.js';
 import {mediaField,bindMedia} from "./media.js";
-import { db, result, options, save } from "./data.js";
+import { result } from "./data.js";
 import {
   field,
   choice,
@@ -18,6 +19,7 @@ import {
   procedureSchema,
 } from "./validation.js";
 export async function clientForm(ctx, client = {}) {
+ const {db,options,save}=dataFor(ctx.db);
   const professionals =
     ctx.user.role === "admin"
       ? await result(
@@ -89,6 +91,7 @@ export async function clientForm(ctx, client = {}) {
   );
 }
 export async function appointmentForm(ctx, item = {}, presetClient) {
+ const {db,options,save}=dataFor(ctx.db);
   const o = await options();
   if (!o.clients.length || !o.procedures.length || !o.professionals.length)
     throw Error(
@@ -190,6 +193,7 @@ export async function appointmentForm(ctx, item = {}, presetClient) {
   return d;
 }
 export function treatmentForm(ctx, appointment) {
+ const {db,options,save}=dataFor(ctx.db);
   return modal(
     "Concluir atendimento",
     `<p class="wide muted">${esc(appointment.clients?.name)} · ${esc(appointment.procedures?.name)}</p>` +
@@ -225,6 +229,7 @@ export function treatmentForm(ctx, appointment) {
   );
 }
 export async function procedureForm(ctx, item = {}) {
+ const {db,options,save}=dataFor(ctx.db);
   const staff = await result(
     db.from("professionals").select("id,name").eq("active", true),
   );
@@ -278,5 +283,5 @@ export async function procedureForm(ctx, item = {}) {
       ctx.refresh();
     },
   );
-  bindMedia(dialog);return dialog;
+  bindMedia(dialog,ctx.db);return dialog;
 }

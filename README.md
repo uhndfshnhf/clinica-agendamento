@@ -91,3 +91,7 @@ Consulte `VALIDATION.md` para os resultados executados nesta entrega e as limita
 ## Site editável e área do cliente
 
 Consulte [o guia de ativação](docs/ATIVAR-SITE-E-CLIENTES.md) para aplicar as migrações de site e clientes, configurar o cadastro de clientes e os pedidos sujeitos à aprovação. A área privada fica em `/cliente`, separada do acesso administrativo. Agendar avaliação abre o login ou a página /cliente/agendar para clientes já autenticados. Há limite de duas consultas por semana, somando pedidos pendentes e consultas ativas, validado pelo banco. Os pedidos usam RPC autenticada no Supabase e funcionam também pelo Vite ou servidor estático.
+
+## Central de lojas e publicação separada
+
+A Central de lojas permite cadastrar sites compatíveis por JSON e alternar entre projetos Supabase independentes. Cada projeto continua verificando o acesso da própria equipe. Veja [o guia de conexão e publicação](docs/CENTRAL-DE-LOJAS.md). Em uma implantação exclusiva do painel, use `VITE_APP_MODE=panel`; o build coloca a central na raiz. Para o site de uma clínica, mantenha o modo `clinic`.

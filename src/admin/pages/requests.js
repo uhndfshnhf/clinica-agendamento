@@ -1,7 +1,9 @@
+import { dataFor } from '../data.js';
 import {mountBookingReadiness} from '../booking-readiness.js';
-import {db,result} from '../data.js';
+import { result } from '../data.js';
 import {pageHead,table,esc,date,time,badge,pager,toast,confirmAction,bind} from '../ui.js';
 export async function render(root,ctx){
+ const {db}=dataFor(ctx.db);
  let status='pending',page=0;
  async function draw(){
   const {data,error,count}=await db.from('booking_requests').select('*,procedures(name),professionals(name)',{count:'exact'}).eq('status',status).order('created_at',{ascending:false}).range(page*20,page*20+19);if(error)throw error;

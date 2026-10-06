@@ -1,4 +1,5 @@
-import { db, result, options, save } from "../data.js";
+import { dataFor } from '../data.js';
+import { result } from "../data.js";
 import {
   pageHead,
   button,
@@ -43,6 +44,7 @@ async function optimize(file) {
   );
 }
 export async function photoForm(ctx, presetClient) {
+ const {db,options,save}=dataFor(ctx.db);
   const o = await options();
   const treatments = await result(
     db
@@ -120,6 +122,7 @@ export async function photoForm(ctx, presetClient) {
   return d;
 }
 export async function photoTimeline(root, ctx, clientId, filters = {}) {
+ const {db,options,save}=dataFor(ctx.db);
   let q = db
     .from("evolution_photos")
     .select("*,clients(name),procedures(name)", { count: "exact" })
@@ -218,6 +221,7 @@ export async function photoTimeline(root, ctx, clientId, filters = {}) {
   };
 }
 export async function render(root, ctx) {
+ const {db,options,save}=dataFor(ctx.db);
   let client = "",
     category = "",
     page = 0,

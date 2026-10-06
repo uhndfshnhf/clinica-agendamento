@@ -1,4 +1,5 @@
-import { db, result, options, save } from "../data.js";
+import { dataFor } from '../data.js';
+import { result } from "../data.js";
 import {
   pageHead,
   button,
@@ -20,6 +21,7 @@ import {
   confirmAction,
 } from "../ui.js";
 export async function reminderForm(ctx, item = {}) {
+ const {db,options,save}=dataFor(ctx.db);
   const o = await options();
   return modal(
     item.id ? "Editar lembrete" : "Novo lembrete",
@@ -77,6 +79,7 @@ export async function reminderForm(ctx, item = {}) {
   );
 }
 export async function render(root, ctx) {
+ const {db,options,save}=dataFor(ctx.db);
   let page = 0,
     status = "pending",
     kind = "",

@@ -1,4 +1,5 @@
-import { appointments } from "../data.js";
+import { dataFor } from '../data.js';
+
 import {
   pageHead,
   button,
@@ -39,6 +40,7 @@ export function appointmentTable(rows, actions = true) {
   );
 }
 export function bindAppointments(root, rows, ctx) {
+ const {appointments}=dataFor(ctx.db);
   bind(root, "[data-edit]", (el) =>
     appointmentForm(
       ctx,
@@ -53,6 +55,7 @@ export function bindAppointments(root, rows, ctx) {
   );
 }
 export async function render(root, ctx) {
+ const {appointments}=dataFor(ctx.db);
   let view = "day",
     chosen = today();
   async function draw() {

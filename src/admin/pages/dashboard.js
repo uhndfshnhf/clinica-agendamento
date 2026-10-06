@@ -1,4 +1,5 @@
-import { db, result, appointments } from "../data.js";
+import { dataFor } from '../data.js';
+import { result } from "../data.js";
 import {
   pageHead,
   button,
@@ -18,6 +19,7 @@ import {
 import { appointmentForm } from "../forms.js";
 import { appointmentTable } from "./agenda.js";
 export async function render(root, ctx) {
+ const {db,appointments}=dataFor(ctx.db);
   const day = today(),
     tomorrow = new Date(day + "T12:00:00Z");
   tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);

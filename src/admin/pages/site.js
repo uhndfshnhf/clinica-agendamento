@@ -1,4 +1,5 @@
-import {db,result} from '../data.js';
+import { dataFor } from '../data.js';
+import { result } from '../data.js';
 import {pageHead,field,esc,toast,errorText,safeImage} from '../ui.js';
 import {mediaField,bindMedia} from '../media.js';
 const groups={
@@ -20,6 +21,7 @@ async function defaults(){
  const c=structuredClone(window.CLINIC_CONFIG);c.copy={};c.hero.title='Beleza e cuidado em um só lugar';c.branding={logoWord:c.logoWord,tagline:c.tagline,colors:c.colors,description:c.seo.description,demo:c.demo};return c;
 }
 export async function render(root,ctx){
+ const {db}=dataFor(ctx.db);
  const rows=await result(db.from('site_content').select('*'));const draft=await defaults();for(const r of rows)draft[r.section]=r.content;
  let section='hero';
  function draw(){
@@ -32,7 +34,7 @@ export async function render(root,ctx){
     return field(name,label,type==='lines'?'textarea':type, type==='lines'?(value||[]).join('\n'):value,{wide:type==='textarea'||type==='lines',maxLength:type==='textarea'?5000:2000,...(type==='number'?{min:1,max:5}:{})});
    }).join('')}</div></section>`).join('')}${group.array?'<button type="button" class="btn secondary" id="add-item">+ Adicionar item</button>':''}${['results','testimonials'].includes(section)?'<label class="field wide"><span><input type="checkbox" name="authorized" required> Confirmo que tenho autorização para publicar estas imagens ou depoimentos e que os textos são verdadeiros.</span></label>':''}<p class="form-error" role="alert"></p><button class="btn primary" type="submit">Salvar e publicar seção</button></form></section>`;
   root.querySelector('#section').onchange=e=>{section=e.target.value;draw();};
-  const form=root.querySelector('form');bindMedia(form);
+  const form=root.querySelector('form');bindMedia(form,ctx.db);
   function read(){
    const f=new FormData(form);return items.map((item,i)=>{const next=structuredClone(item);for(const [key,,type='text'] of group.fields){let value=f.get(`${i}_${key}`)||'';if(type==='lines')value=value.split('\n').map(v=>v.trim()).filter(Boolean).slice(0,12);if(type==='boolean')value=value==='true';if(type==='number')value=Number(value);set(next,key,value);}if(section==='results')next.placeholder=false;return next;});
   }
