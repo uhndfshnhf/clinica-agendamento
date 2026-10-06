@@ -161,19 +161,6 @@ if(!reduced.matches&&'IntersectionObserver'in window){document.documentElement.c
 reduced.addEventListener('change',()=>{if(reduced.matches){document.documentElement.classList.remove('js-motion');$$('.reveal').forEach(el=>el.classList.add('revealed'));}});
 if('IntersectionObserver'in window){const steps=new IntersectionObserver(entries=>entries.forEach(entry=>{if(entry.isIntersecting)entry.target.classList.add('active');}),{threshold:.5});$$('.method-step').forEach(el=>steps.observe(el));}
 
-const heroArt=$('.hero-art'),toggle=$('#video-toggle');let manuallyPaused=false;let heroVisible=true;
-heroArt.style.backgroundImage=`url('${safeMedia(C.hero.poster||C.hero.image)}')`;
-const video=document.createElement('video');video.className='hero-video';video.muted=true;video.defaultMuted=true;video.loop=true;video.playsInline=true;video.autoplay=true;video.controls=false;video.setAttribute('autoplay','');video.setAttribute('muted','');video.setAttribute('playsinline','');video.preload='auto';video.poster=safeMedia(C.hero.poster);video.setAttribute('aria-hidden','true');video.setAttribute('tabindex','-1');
-if(safeMedia(C.hero.video)) {video.src=safeMedia(C.hero.video);heroArt.append(video);$('.hero').append(toggle);toggle.hidden=false;}
-function syncVideo(){toggle.hidden=reduced.matches||!safeMedia(C.hero.video);if(reduced.matches||manuallyPaused||document.hidden||!heroVisible){video.pause();}else video.play().catch(()=>{});toggle.setAttribute('aria-label',video.paused?'Reproduzir vídeo da hero':'Pausar vídeo da hero');toggle.innerHTML=video.paused?'<span aria-hidden="true">▷</span>':'<span aria-hidden="true">Ⅱ</span>';}
-toggle.addEventListener('click',()=>{manuallyPaused=!manuallyPaused;syncVideo();});
-video.addEventListener('play',()=>{toggle.setAttribute('aria-label','Pausar vídeo da hero');toggle.innerHTML='<span aria-hidden="true">Ⅱ</span>';});video.addEventListener('pause',()=>{toggle.setAttribute('aria-label','Reproduzir vídeo da hero');toggle.innerHTML='<span aria-hidden="true">▷</span>';});
-video.addEventListener('error',()=>{video.hidden=true;toggle.hidden=true;});
-if('IntersectionObserver'in window)new IntersectionObserver(entries=>{heroVisible=entries[0].isIntersecting;syncVideo();},{threshold:0}).observe($('.hero'));
-video.addEventListener('loadeddata',syncVideo);video.addEventListener('canplay',syncVideo);addEventListener('pageshow',syncVideo);
-document.addEventListener('pointerdown',syncVideo,{once:true});document.addEventListener('keydown',syncVideo,{once:true});
-document.addEventListener('visibilitychange',syncVideo);reduced.addEventListener('change',syncVideo);syncVideo();
-
 // Não publique uma empresa, autoridade ou avaliações fictícias em dados estruturados.
 // Schema passa a ser emitido apenas com demo:false e endereço real configurado.
 if(!C.demo&&C.seo.streetAddress){const type=['LocalBusiness','MedicalBusiness'].includes(C.seo.businessType)?C.seo.businessType:'LocalBusiness';const schema={'@context':'https://schema.org','@type':type,name:C.name,url:$('meta[property="og:url"]').content,description:C.seo.description,address:{'@type':'PostalAddress',streetAddress:C.seo.streetAddress,addressLocality:C.seo.addressLocality,addressRegion:C.seo.addressRegion,postalCode:C.seo.postalCode,addressCountry:'BR'}};if(phone)schema.telephone='+'+phone;if(instagram)schema.sameAs=[instagram];const node=document.createElement('script');node.type='application/ld+json';node.textContent=JSON.stringify(schema);document.head.append(node);}

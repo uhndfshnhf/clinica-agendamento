@@ -1,3 +1,4 @@
+import {mountHero} from './hero.js';
 import {renderSiteChrome} from './site-chrome.js';
 import { db, configured } from "./supabase.js";
 import "./public-integration.css";
@@ -18,7 +19,9 @@ async function start() {
     );
   const config = window.CLINIC_CONFIG;
   if (!config) return;
+  const hero=mountHero(config.hero);
   const catalog=await preparePublicSite(config);
+  hero.update(config.hero);
   const chrome=renderSiteChrome(config);
   await loadPremium();
   async function accountHeader(){

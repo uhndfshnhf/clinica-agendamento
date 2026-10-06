@@ -109,20 +109,10 @@
 
 .q-booking-open{display:block;margin:24px 0;padding:16px 24px;background:#493b33;color:#fff;font:14px Arial,sans-serif;border:0;cursor:pointer}.q-captcha{margin:20px 0;min-height:65px}a.q-interest-link{display:block;margin:20px 0}.q-interest-dialog input[type=checkbox]{width:18px}
 
-.header-account{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;padding:10px 14px;border:1px solid #b59888;color:#303c44;font:12px Arial,sans-serif;text-decoration:none;margin-left:12px}.customer-profile p{margin:10px 0}@media(max-width:1100px){.header-account{margin-left:auto;margin-right:12px}}@media(max-width:600px){.header-account{font-size:11px;padding:9px 10px;margin-left:auto;margin-right:8px}.premium-header .brand{min-width:0}}
-
-.header-account{max-width:180px;overflow:hidden}@media(max-width:600px){.header-account{max-width:135px}}
-/* Public account and booking controls. */
-.premium-header .header-actions{display:flex;align-items:center;gap:12px;justify-self:end}.premium-header .header-actions .header-cta{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;white-space:nowrap}.premium-header .header-actions .header-account{position:static;display:inline-flex;align-items:center;justify-content:center;max-width:150px;padding:11px 16px;border:1px solid currentColor;border-radius:4px;font-size:11px;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.floating-wa{width:58px!important;height:58px!important;padding:0!important;border-radius:50%!important;display:flex;align-items:center;justify-content:center}.floating-wa .wa-icon{width:25px;height:25px}.premium-button,.outline-button{text-decoration:none}.header-actions a:focus-visible,.floating-wa:focus-visible{outline:2px solid #dcb598;outline-offset:4px}
-@media(min-width:901px){.premium-header{grid-template-columns:auto minmax(0,1fr) auto!important;gap:20px!important}.premium-header nav{gap:14px!important}.premium-header nav>a{font-size:10px!important}}
-@media(max-width:900px){.premium-header .header-actions{margin-left:auto;margin-right:48px;gap:8px}.premium-header .header-actions .header-cta{padding:10px 12px;font-size:10px}.premium-header .header-actions .header-account{font-size:10px;padding:9px 12px;max-width:125px}.premium-header .brand{flex-shrink:0}.premium-header .menu-toggle{position:absolute;right:18px}.floating-wa{right:20px!important;bottom:20px!important}}
-@media(max-width:480px){.premium-header{padding-left:14px!important;padding-right:14px!important;gap:8px!important}.premium-header .brand-words{font-size:10px!important;letter-spacing:1px!important}.premium-header .brand-words small{font-size:5px!important}.premium-header .monogram{font-size:30px!important}.premium-header .header-actions{gap:5px;margin-right:31px}.premium-header .header-actions .header-cta{font-size:9px;padding:9px 8px}.premium-header .header-actions .header-account{font-size:9px;padding:9px 7px;max-width:85px}.premium-header .menu-toggle{right:12px;width:23px}.premium-header .header-account:before{display:none}}
-
-.premium-header .header-actions .header-account{margin:0;color:#fff;border-color:#ffffff90;background:#ffffff0a}.premium-header.scrolled .header-actions .header-account{color:#303c44;border-color:#b5988880;background:transparent}.premium-header .header-actions .header-cta{font-family:Arial,sans-serif;border-radius:4px}
-@media(min-width:901px) and (max-width:1200px){.premium-header{padding-left:3%!important;padding-right:3%!important;gap:12px!important}.premium-header nav{gap:10px!important}.premium-header .header-actions{gap:7px}.premium-header .header-actions .header-cta{padding:10px}.premium-header .header-actions .header-account{padding:10px;max-width:120px}.premium-header .brand-words{font-size:11px;letter-spacing:2px}}
-
-@media(max-width:480px){.premium-header .header-actions .header-cta,.premium-header .header-actions .header-account{min-height:40px}}
-@media(max-width:360px){.premium-header .brand-words{display:none}.premium-header .header-actions{margin-right:33px}}
+.customer-profile p{margin:10px 0}
+.floating-wa{width:58px!important;height:58px!important;padding:0!important;border-radius:50%!important;display:flex;align-items:center;justify-content:center}.floating-wa .wa-icon{width:25px;height:25px}
+.premium-button,.outline-button{text-decoration:none}.header-actions a:focus-visible,.floating-wa:focus-visible{outline:2px solid #dcb598;outline-offset:4px}
+@media(max-width:900px){.floating-wa{right:20px!important;bottom:20px!important}}
 /* Editable public header and footer. */
 .premium-header .brand-logo,.premium-footer .brand-logo{max-width:180px;max-height:64px;width:auto;height:auto;object-fit:contain}
 .premium-header .brand{min-width:0}.premium-header .brand-words{overflow-wrap:anywhere}.premium-header #navigation a{overflow-wrap:anywhere}
