@@ -95,3 +95,9 @@ Consulte [o guia de ativação](docs/ATIVAR-SITE-E-CLIENTES.md) para aplicar as 
 ## Central de lojas e publicação separada
 
 A Central de lojas permite cadastrar sites compatíveis por JSON e alternar entre projetos Supabase independentes. Cada projeto continua verificando o acesso da própria equipe. Veja [o guia de conexão e publicação](docs/CENTRAL-DE-LOJAS.md). Em uma implantação exclusiva do painel, use `VITE_APP_MODE=panel`; o build coloca a central na raiz. Para o site de uma clínica, mantenha o modo `clinic`.
+
+## Cabeçalho e rodapé pelo painel
+
+Em **Personalizar site**, selecione **Cabeçalho — marca e botões**, **Cabeçalho — links do menu**, **Rodapé — conteúdo completo**, **Rodapé — links de navegação** ou **Rodapé — links de contato e redes sociais**. É possível trocar o logo, textos e rótulos, ocultar elementos e adicionar, remover ou reordenar links. O acesso à conta e o agendamento conservam seus destinos autenticados.
+
+O rodapé pode usar os contatos de Configurações ou informações próprias. O texto de direitos autorais aceita `{ano}` e `{clinica}`. O conteúdo dos avisos legais continua em **Privacidade e termos**. Salve a seção e atualize o site para conferir. As configurações ficam na seção `copy` existente, com as permissões atuais; não é necessária uma migração adicional.

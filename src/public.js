@@ -1,3 +1,4 @@
+import {renderSiteChrome} from './site-chrome.js';
 import { db, configured } from "./supabase.js";
 import "./public-integration.css";
 import {preparePublicSite,loadPremium} from "./public-catalog.js";
@@ -18,20 +19,21 @@ async function start() {
   const config = window.CLINIC_CONFIG;
   if (!config) return;
   const catalog=await preparePublicSite(config);
+  const chrome=renderSiteChrome(config);
   await loadPremium();
   async function accountHeader(){
     const link=document.querySelector('#header-account');if(!link)return;
     if(!configured)return;
     const {data:{session}}=await db.auth.getSession();
-    if(!session){link.textContent='Entrar';return;}
+    if(!session){link.textContent=chrome.header.loginLabel;return;}
     const {data:profile}=await db.rpc('customer_portal');
-    link.textContent=profile?.client?'Meu perfil · '+profile.client.name.split(' ')[0]:'Minha conta';
+    link.textContent=profile?.client?chrome.header.profileLabel+(chrome.header.showClientName?' · '+profile.client.name.split(' ')[0]:''):chrome.header.accountLabel;
   }
   await accountHeader();
   db?.auth.onAuthStateChange(()=>setTimeout(accountHeader,0));
   for(const [key,selector] of Object.entries({procedures:'#procedures-title',results:'#results-title',results_intro:'#resultados .section-heading>p:last-child',method:'#method-title',team:'#team-title',testimonials:'#testimonials-title',clinic:'#clinic-title',clinic_intro:'.gallery-heading>p',faq:'#faq-title',faq_intro:'.faq-intro',cta:'#cta-title',cta_intro:'.final-cta .section-inner>p:not(.eyebrow)',contact:'#contact-title'})){if(config.copy?.[key])document.querySelector(selector).textContent=config.copy[key];}
   if(config.hero.title)document.querySelector('#hero-title').textContent=config.hero.title;
-  if(config.email){const a=document.createElement('a');a.href='mailto:'+config.email;a.textContent=config.email;document.querySelector('#footer-contact').append(a);}
+
   const portal=document.createElement('a');portal.href='/cliente';portal.className='q-interest-link';portal.textContent='Minha conta · agendamentos e acompanhamento';document.querySelector('#contact-content').after(portal);
   await mountBooking(catalog);
   // Secondary contact request, separate from appointment scheduling.
@@ -80,7 +82,7 @@ async function start() {
       button.disabled = false;
     }
   };
-  config.legal.privacy =
+  if(!catalog?.content?.legal?.privacy)config.legal.privacy =
     "Ao solicitar um contato, coletamos seu nome, WhatsApp e procedimento de interesse para responder ao seu pedido. O acesso é restrito à equipe autorizada da clínica. Não envie informações de saúde por este formulário. Para solicitar acesso, correção ou exclusão dos seus dados, entre em contato com a clínica pelos canais desta página. Links externos (WhatsApp, Instagram e Google Maps) seguem suas próprias políticas. Agendamentos e fotos de acompanhamento ficam em área autenticada. Somente imagens com autorização de publicação são exibidas na galeria pública.";
 }
 start();

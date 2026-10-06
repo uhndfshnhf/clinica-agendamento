@@ -40,7 +40,7 @@ document.title = `Clínica de Estética e Harmonização Facial | ${C.name}`;
 $('meta[name="description"]').content = C.seo.description;
 $('meta[property="og:title"]').content = document.title;
 $('meta[property="og:description"]').content = C.seo.description;
-$$('.brand').forEach(el => {
+$$('.brand:not([data-site-brand])').forEach(el => {
   el.setAttribute('aria-label',C.name + ' — início');
   if (safeMedia(C.logo)) el.innerHTML = `<img class="client-logo" src="${esc(safeMedia(C.logo))}" alt="${esc(C.name)}">`;
   else { $('.brand-words',el).firstChild.textContent = C.logoWord; $('.brand-words small',el).textContent = C.tagline; }
@@ -132,8 +132,7 @@ $('#contact-demo').hidden=!C.demo;
 const map=safeLink(C.mapEmbedUrl);
 if(map && /^https:\/\/(www\.)?google\.com\/maps\/embed(?:[/?]|$)/.test(map))$('#map-frame').innerHTML=`<iframe src="${esc(map)}" title="Localização da ${esc(C.name)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`;
 else $('#map-frame > p').textContent=C.address;
-$('#footer-contact').innerHTML=`${instagram?`<a href="${esc(instagram)}" target="_blank" rel="noopener noreferrer">Instagram</a>`:'<span>Instagram</span>'}<a href="/cliente/agendar">Agendar avaliação</a><p>${esc(C.address)}</p>`;
-$('#copyright').textContent=`© ${new Date().getFullYear()} ${C.name}. Todos os direitos reservados.`;$('#footer-demo').hidden=!C.demo;
+
 
 const dialog=$('#info-dialog');
 function showInfo(title,html){$('#info-title').textContent=title;$('#info-body').innerHTML=html;dialog.showModal();}
@@ -147,8 +146,8 @@ $$('[data-person]').forEach(el=>el.addEventListener('click',()=>personInfo(Numbe
 $('.close',dialog).addEventListener('click',()=>dialog.close());dialog.addEventListener('click',e=>{const rect=dialog.getBoundingClientRect();if(e.target===dialog&&(e.clientX<rect.left||e.clientX>rect.right||e.clientY<rect.top||e.clientY>rect.bottom))dialog.close();});
 
 const menu=$('.menu-toggle'),nav=$('#navigation');
-function closeMenu(){nav.classList.remove('open');menu.setAttribute('aria-expanded','false');menu.setAttribute('aria-label','Abrir menu');}
-menu.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));menu.setAttribute('aria-label',open?'Fechar menu':'Abrir menu');});
+function closeMenu(){nav.classList.remove('open');menu.setAttribute('aria-expanded','false');menu.setAttribute('aria-label',menu.dataset.openLabel||'Abrir menu');}
+menu.addEventListener('click',()=>{const open=nav.classList.toggle('open');menu.setAttribute('aria-expanded',String(open));menu.setAttribute('aria-label',open?(menu.dataset.closeLabel||'Fechar menu'):(menu.dataset.openLabel||'Abrir menu'));});
 $$('a,button',nav).forEach(el=>el.addEventListener('click',closeMenu));
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu();});
 document.addEventListener('click',e=>{if(!e.target.closest('.premium-header'))closeMenu();});

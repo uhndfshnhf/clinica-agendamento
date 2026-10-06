@@ -123,3 +123,14 @@
 
 @media(max-width:480px){.premium-header .header-actions .header-cta,.premium-header .header-actions .header-account{min-height:40px}}
 @media(max-width:360px){.premium-header .brand-words{display:none}.premium-header .header-actions{margin-right:33px}}
+/* Editable public header and footer. */
+.premium-header .brand-logo,.premium-footer .brand-logo{max-width:180px;max-height:64px;width:auto;height:auto;object-fit:contain}
+.premium-header .brand{min-width:0}.premium-header .brand-words{overflow-wrap:anywhere}.premium-header #navigation a{overflow-wrap:anywhere}
+.premium-footer .footer-top{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:32px}
+.premium-footer .footer-brand-description,.premium-footer .footer-extra{font:12px/1.8 var(--sans);color:#bbb4ad;white-space:normal;overflow-wrap:anywhere}
+.premium-footer .footer-brand-description{margin:20px 0 0;max-width:320px}.premium-footer .footer-extra{margin:0 0 24px}
+.premium-footer .footer-navigation h3,.premium-footer #footer-contact h3{font:12px/1.5 var(--sans);margin:0 0 14px;color:inherit}
+.premium-footer nav a,.premium-footer #footer-contact a,.premium-footer #footer-contact p,#copyright{overflow-wrap:anywhere}
+@media(max-width:700px){.premium-footer .footer-top{grid-template-columns:1fr;gap:28px}.premium-header .brand-logo{max-width:115px;max-height:48px}}
+
+@media(max-width:900px){.premium-header #navigation.open{max-height:calc(100dvh - 100px);overflow-y:auto;overscroll-behavior:contain}}

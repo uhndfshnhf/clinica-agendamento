@@ -1,0 +1,18 @@
+import{siteChrome,siteLink}from'./shared/site-chrome.js';
+import{isPublicMediaUrl}from'./shared/media-validation.js';
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const lines=v=>esc(v).replace(/\n/g,'<br>');
+function brand(value){const logo=isPublicMediaUrl(value.logo,{allowLocal:import.meta.env.DEV})?value.logo:'';return `<a class="brand" data-site-brand href="${esc(siteLink(value.brandLink)||'#inicio')}" aria-label="${esc(value.logoAlt||value.brandName)}">${logo?`<img class="brand-logo" src="${esc(logo)}" alt="${esc(value.logoAlt)}">`:`<span class="monogram" aria-hidden="true">${esc(value.monogram)}</span><span class="brand-words">${esc(value.brandName)}<small>${esc(value.brandSubtitle)}</small></span>`}</a>`;}
+function links(items){return items.filter(i=>i&&i.label).map(i=>{const url=siteLink(i.href);return url?`<a href="${esc(url)}" ${i.newWindow?'target="_blank" rel="noopener noreferrer"':''}>${esc(i.label)}</a>`:`<span>${esc(i.label)}</span>`;}).join('');}
+export function renderSiteChrome(config){
+ const {header:h,footer:f}=siteChrome(config);const header=document.querySelector('#site-header');
+ header.querySelector('.brand').outerHTML=brand(h);
+ const nav=header.querySelector('#navigation');nav.setAttribute('aria-label',h.menuLabel);nav.innerHTML=links(h.links)+(h.showBooking?`<a class="reservation nav-mobile-cta" href="/cliente/agendar">${esc(h.bookingLabel)}</a>`:'');
+ const toggle=header.querySelector('.menu-toggle');toggle.setAttribute('aria-label',h.menuOpenLabel);toggle.dataset.openLabel=h.menuOpenLabel;toggle.dataset.closeLabel=h.menuCloseLabel;
+ header.querySelector('.header-actions').innerHTML=(h.showBooking?`<a class="reservation header-cta" href="/cliente/agendar">${esc(h.bookingLabel)}</a>`:'')+(h.showAccount?`<a href="/cliente" class="header-account" id="header-account">${esc(h.loginLabel)}</a>`:'');
+ const address=f.useClinicContacts?config.address:f.address,phone=f.useClinicContacts?(config.phoneDisplay||config.phone):f.phone,email=f.useClinicContacts?config.email:f.email,hours=f.useClinicContacts?(config.hours||[]).join('\n'):f.hours;
+ const phoneURL=siteLink('tel:'+String(phone||'').replace(/[^\d+]/g,'')),emailURL=siteLink('mailto:'+String(email||''));
+ const contacts=links(f.contactLinks)+(f.showAddress&&address?`<p>${lines(address)}</p>`:'')+(f.showPhone&&phone&&phoneURL?`<a href="${esc(phoneURL)}">${esc(phone)}</a>`:'')+(f.showEmail&&email&&emailURL?`<a href="${esc(emailURL)}">${esc(email)}</a>`:'')+(f.showHours&&hours?`<p>${lines(hours)}</p>`:'');
+ document.querySelector('.premium-footer .section-inner').innerHTML=`<div class="footer-top">${f.showBrand?`<div class="footer-brand">${brand(f)}${f.brandDescription?`<p class="footer-brand-description">${lines(f.brandDescription)}</p>`:''}</div>`:''}${f.links.length?`<div class="footer-navigation">${f.navigationTitle?`<h3>${esc(f.navigationTitle)}</h3>`:''}<nav aria-label="${esc(f.navigationLabel)}">${links(f.links)}</nav></div>`:''}<div id="footer-contact">${f.contactTitle&&contacts?`<h3>${esc(f.contactTitle)}</h3>`:''}${contacts}</div></div>${f.extraText?`<p class="footer-extra">${lines(f.extraText)}</p>`:''}<div class="footer-bottom"><p id="copyright" ${f.showCopyright?'':'hidden'}>${lines(String(f.copyright).replaceAll('{ano}',String(new Date().getFullYear())).replaceAll('{clinica}',config.name||''))}</p><div>${f.showPrivacy?`<button data-legal="privacy">${esc(f.privacyLabel)}</button>`:''}${f.showTerms?`<button data-legal="terms">${esc(f.termsLabel)}</button>`:''}</div></div><p class="demo-note" id="footer-demo" ${f.showDemo?'':'hidden'}>${lines(f.demoNote)}</p>`;
+ return {header:h,footer:f};
+}
