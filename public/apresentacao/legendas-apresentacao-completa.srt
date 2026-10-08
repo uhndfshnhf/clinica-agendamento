@@ -1,0 +1,203 @@
+1
+00:00:00,400 --> 00:00:05,392
+Imagine apresentar sua clínica e organizar os pedidos de consulta em uma mesma solução.
+
+2
+00:00:05,592 --> 00:00:11,095
+Neste vídeo, você vai entender o que o cliente vê no site e como a equipe cuida de tudo pelo painel.
+
+3
+00:00:11,295 --> 00:00:14,337
+Não precisa conhecer programação ou sistemas para acompanhar.
+
+4
+00:00:15,437 --> 00:00:20,546
+O site é a parte que os clientes visitam para conhecer a clínica, os tratamentos e a equipe.
+
+5
+00:00:20,746 --> 00:00:24,577
+O painel é uma área de trabalho reservada para quem administra a clínica.
+
+6
+00:00:24,777 --> 00:00:30,535
+Pense no site como a recepção digital, e no painel como a organização que acontece nos bastidores.
+
+7
+00:00:31,635 --> 00:00:37,127
+Antes de pedir uma consulta, a pessoa pode conhecer os tratamentos e entender o que a clínica oferece.
+
+8
+00:00:37,327 --> 00:00:42,830
+Fotos, apresentação da equipe e informações de contato ajudam a deixar esse primeiro contato mais claro.
+
+9
+00:00:43,030 --> 00:00:48,104
+O site também pode ser acessado pelo celular, que muitas pessoas usam para procurar atendimento.
+
+10
+00:00:49,204 --> 00:00:53,383
+Para solicitar uma consulta pelo site, o cliente precisa ter uma conta.
+
+11
+00:00:53,583 --> 00:00:57,519
+Depois de entrar, ele acessa seu próprio perfil, organizado em abas.
+
+12
+00:00:57,719 --> 00:01:05,231
+Ali, pode acompanhar os pedidos e as informações disponibilizadas pela clínica, sem precisar procurar tudo em conversas antigas.
+
+13
+00:01:06,331 --> 00:01:11,010
+Na página de agendamento, o cliente escolhe o tratamento e um horário disponível.
+
+14
+00:01:11,210 --> 00:01:14,193
+Depois, envia a solicitação para a equipe avaliar.
+
+15
+00:01:14,393 --> 00:01:19,920
+É importante entender esta diferença: pedir um horário não significa que a consulta já está confirmada.
+
+16
+00:01:20,120 --> 00:01:24,648
+A configuração atual também limita cada cliente a duas consultas por semana.
+
+17
+00:01:25,748 --> 00:01:29,927
+A equipe vê os pedidos recebidos em uma área de solicitações de agendamento.
+
+18
+00:01:30,127 --> 00:01:34,272
+Ela pode analisar o serviço, o cliente e o horário antes de aceitar.
+
+19
+00:01:34,472 --> 00:01:37,804
+Quando a equipe aprova, a consulta passa a fazer parte da agenda.
+
+20
+00:01:38,004 --> 00:01:42,102
+Isso mantém a decisão nas mãos da clínica e ajuda a organizar o atendimento.
+
+21
+00:01:43,202 --> 00:01:48,729
+Na agenda, a equipe consegue visualizar as consultas e organizar os horários dos profissionais.
+
+22
+00:01:48,929 --> 00:01:53,027
+As visualizações por dia, semana e mês ajudam a entender a rotina.
+
+23
+00:01:53,227 --> 00:01:59,415
+Assim, fica mais fácil conferir quem será atendido e encontrar as informações necessárias para cada consulta.
+
+24
+00:02:00,515 --> 00:02:04,346
+Os clientes cadastrados podem ser consultados pela equipe no painel.
+
+25
+00:02:04,546 --> 00:02:08,958
+A ficha reúne informações do cadastro, consultas e registros de acompanhamento.
+
+26
+00:02:09,158 --> 00:02:12,989
+A equipe também pode registrar observações importantes para o atendimento.
+
+27
+00:02:13,189 --> 00:02:18,077
+São informações organizadas por cliente, em vez de espalhadas em anotações separadas.
+
+28
+00:02:19,177 --> 00:02:24,715
+Há uma diferença entre uma foto usada para apresentar a clínica e uma foto do acompanhamento de um cliente.
+
+29
+00:02:24,915 --> 00:02:28,038
+A galeria pública mostra o conteúdo escolhido para o site.
+
+30
+00:02:28,238 --> 00:02:33,858
+O acompanhamento privado é destinado ao cliente correspondente, conforme os acessos permitidos.
+
+31
+00:02:34,058 --> 00:02:38,969
+Antes de publicar imagens de clientes, a clínica precisa obter a autorização adequada.
+
+32
+00:02:40,069 --> 00:02:46,233
+Se a clínica muda um tratamento ou quer atualizar as informações de um serviço, a equipe pode fazer isso pelo painel.
+
+33
+00:02:46,433 --> 00:02:50,207
+Não é preciso abrir o código do site para cada alteração de conteúdo.
+
+34
+00:02:50,407 --> 00:02:55,062
+Ao salvar as mudanças publicadas, o site passa a apresentar as novas informações.
+
+35
+00:02:55,262 --> 00:02:59,186
+Isso ajuda a manter a apresentação alinhada ao que a clínica realmente oferece.
+
+36
+00:03:00,286 --> 00:03:05,267
+O painel também permite personalizar o conteúdo do site, incluindo textos e imagens.
+
+37
+00:03:05,467 --> 00:03:10,192
+O cabeçalho é a parte de cima, onde ficam a marca, o menu e os botões.
+
+38
+00:03:10,392 --> 00:03:15,118
+O rodapé é a parte de baixo, com informações como contatos, endereço e links.
+
+39
+00:03:15,318 --> 00:03:19,950
+Esses conteúdos podem ser ajustados para a identidade e as necessidades da clínica.
+
+40
+00:03:21,050 --> 00:03:24,963
+O cliente continua podendo falar com a clínica pelo botão do WhatsApp.
+
+41
+00:03:25,163 --> 00:03:28,425
+Esse botão abre a conversa com o número configurado pela equipe.
+
+42
+00:03:28,625 --> 00:03:35,452
+A proposta é usar o site para apresentar os serviços e organizar os pedidos, mantendo o WhatsApp como um canal de conversa.
+
+43
+00:03:35,652 --> 00:03:38,833
+A equipe escolhe como combinar esses recursos no atendimento.
+
+44
+00:03:39,933 --> 00:03:43,346
+A central permite reunir o acesso a mais de uma clínica conectada.
+
+45
+00:03:43,546 --> 00:03:47,819
+A pessoa escolhe a clínica que deseja administrar e abre o painel correspondente.
+
+46
+00:03:48,019 --> 00:03:52,349
+Cada clínica precisa ser configurada e ter seus próprios acessos autorizados.
+
+47
+00:03:52,549 --> 00:03:58,470
+Isso permite organizar uma operação com vários sites, sem tratar todos como se fossem a mesma clínica.
+
+48
+00:03:59,570 --> 00:04:05,712
+Na implantação, são definidos o visual, os conteúdos, os acessos e as configurações de cada clínica.
+
+49
+00:04:05,912 --> 00:04:09,174
+A equipe recebe orientação para usar a solução na rotina.
+
+50
+00:04:09,374 --> 00:04:14,796
+O próximo passo é uma demonstração: ver o cliente pedir uma consulta e a equipe receber esse pedido.
+
+51
+00:04:14,996 --> 00:04:21,080
+Assim, você avalia se o fluxo faz sentido para o seu atendimento, com um escopo claro antes de contratar.

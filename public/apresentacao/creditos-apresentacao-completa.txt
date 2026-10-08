@@ -1,0 +1,4 @@
+Imagens: capturas reais do projeto Quartier, com dados de demonstração.
+Voz: narração sintética Piper, pt_BR-faber-medium. Dataset CC0.
+Modelo: https://huggingface.co/rhasspy/piper-voices/tree/main/pt/pt_BR/faber/medium
+Nenhuma promessa de resultado clínico/comercial. Funcionalidades dependem da configuração e implantação de cada clínica.

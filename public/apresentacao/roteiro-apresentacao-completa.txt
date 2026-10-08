@@ -1,0 +1,82 @@
+APRESENTAÇÃO COMPLETA · QUARTIER
+
+00:00:00 — Uma clínica bem apresentada. Uma rotina mais organizada.
+Imagine apresentar sua clínica e organizar os pedidos de consulta em uma mesma solução.
+Neste vídeo, você vai entender o que o cliente vê no site e como a equipe cuida de tudo pelo painel.
+Não precisa conhecer programação ou sistemas para acompanhar.
+
+00:00:15 — Site e painel: qual é a diferença?
+O site é a parte que os clientes visitam para conhecer a clínica, os tratamentos e a equipe.
+O painel é uma área de trabalho reservada para quem administra a clínica.
+Pense no site como a recepção digital, e no painel como a organização que acontece nos bastidores.
+
+00:00:31 — O primeiro contato com a sua clínica.
+Antes de pedir uma consulta, a pessoa pode conhecer os tratamentos e entender o que a clínica oferece.
+Fotos, apresentação da equipe e informações de contato ajudam a deixar esse primeiro contato mais claro.
+O site também pode ser acessado pelo celular, que muitas pessoas usam para procurar atendimento.
+
+00:00:48 — Uma conta para cada cliente.
+Para solicitar uma consulta pelo site, o cliente precisa ter uma conta.
+Depois de entrar, ele acessa seu próprio perfil, organizado em abas.
+Ali, pode acompanhar os pedidos e as informações disponibilizadas pela clínica, sem precisar procurar tudo em conversas antigas.
+
+00:01:05 — O cliente escolhe e envia o pedido.
+Na página de agendamento, o cliente escolhe o tratamento e um horário disponível.
+Depois, envia a solicitação para a equipe avaliar.
+É importante entender esta diferença: pedir um horário não significa que a consulta já está confirmada.
+A configuração atual também limita cada cliente a duas consultas por semana.
+
+00:01:25 — A equipe analisa e confirma.
+A equipe vê os pedidos recebidos em uma área de solicitações de agendamento.
+Ela pode analisar o serviço, o cliente e o horário antes de aceitar.
+Quando a equipe aprova, a consulta passa a fazer parte da agenda.
+Isso mantém a decisão nas mãos da clínica e ajuda a organizar o atendimento.
+
+00:01:42 — A agenda da clínica, em um só lugar.
+Na agenda, a equipe consegue visualizar as consultas e organizar os horários dos profissionais.
+As visualizações por dia, semana e mês ajudam a entender a rotina.
+Assim, fica mais fácil conferir quem será atendido e encontrar as informações necessárias para cada consulta.
+
+00:02:00 — O cadastro acompanha a história do cliente.
+Os clientes cadastrados podem ser consultados pela equipe no painel.
+A ficha reúne informações do cadastro, consultas e registros de acompanhamento.
+A equipe também pode registrar observações importantes para o atendimento.
+São informações organizadas por cliente, em vez de espalhadas em anotações separadas.
+
+00:02:18 — Fotos públicas e acompanhamento privado.
+Há uma diferença entre uma foto usada para apresentar a clínica e uma foto do acompanhamento de um cliente.
+A galeria pública mostra o conteúdo escolhido para o site.
+O acompanhamento privado é destinado ao cliente correspondente, conforme os acessos permitidos.
+Antes de publicar imagens de clientes, a clínica precisa obter a autorização adequada.
+
+00:02:39 — Atualize os tratamentos pelo próprio painel.
+Se a clínica muda um tratamento ou quer atualizar as informações de um serviço, a equipe pode fazer isso pelo painel.
+Não é preciso abrir o código do site para cada alteração de conteúdo.
+Ao salvar as mudanças publicadas, o site passa a apresentar as novas informações.
+Isso ajuda a manter a apresentação alinhada ao que a clínica realmente oferece.
+
+00:02:59 — A identidade da clínica também pode mudar.
+O painel também permite personalizar o conteúdo do site, incluindo textos e imagens.
+O cabeçalho é a parte de cima, onde ficam a marca, o menu e os botões.
+O rodapé é a parte de baixo, com informações como contatos, endereço e links.
+Esses conteúdos podem ser ajustados para a identidade e as necessidades da clínica.
+
+00:03:20 — O WhatsApp continua fazendo parte do atendimento.
+O cliente continua podendo falar com a clínica pelo botão do WhatsApp.
+Esse botão abre a conversa com o número configurado pela equipe.
+A proposta é usar o site para apresentar os serviços e organizar os pedidos, mantendo o WhatsApp como um canal de conversa.
+A equipe escolhe como combinar esses recursos no atendimento.
+
+00:03:39 — Mais de uma clínica? Escolha qual administrar.
+A central permite reunir o acesso a mais de uma clínica conectada.
+A pessoa escolhe a clínica que deseja administrar e abre o painel correspondente.
+Cada clínica precisa ser configurada e ter seus próprios acessos autorizados.
+Isso permite organizar uma operação com vários sites, sem tratar todos como se fossem a mesma clínica.
+
+00:03:59 — Veja funcionando. Imagine na sua clínica.
+Na implantação, são definidos o visual, os conteúdos, os acessos e as configurações de cada clínica.
+A equipe recebe orientação para usar a solução na rotina.
+O próximo passo é uma demonstração: ver o cliente pedir uma consulta e a equipe receber esse pedido.
+Assim, você avalia se o fluxo faz sentido para o seu atendimento, com um escopo claro antes de contratar.
+
+Capturas reais da interface com dados demonstrativos. Narração sintética em português brasileiro.
